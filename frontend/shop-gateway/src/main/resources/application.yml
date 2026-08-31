@@ -1,0 +1,132 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: shop-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        enabled: false
+        import-check:
+          enabled: false
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      # ========== 新增：文件上传相关配置 ==========
+      httpclient:
+        # 解决大文件上传问题
+        max-initial-line-length: 10485760
+        max-header-size: 10485760
+        response-timeout: 30s
+        connect-timeout: 30000
+        pool:
+          max-idle-time: 5000
+          max-life-time: 60000
+          acquire-timeout: 45000
+      # ========== 新增：禁用默认的缓存体过滤器 ==========
+      filter:
+        remove-cached-body:
+          enabled: false  # 关键配置：不移除请求体，保留 multipart 内容
+      # ========== 原有 CORS 配置保持不变 ==========
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns: "*"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+      # ========== 原有路由配置保持不变 ==========
+      routes:
+        - id: shop-user-route
+          uri: lb://shop-user
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1
+
+        - id: shop-user-address-route
+          uri: lb://shop-user
+          predicates:
+            - Path=/api/user-address/**
+          filters:
+            - StripPrefix=1
+
+        - id: shop-product
+          uri: lb://shop-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=1
+            # ========== 新增：对 multipart 请求特殊处理 ==========
+            - name: PreserveHostHeader
+
+        - id: shop-product-images
+          uri: lb://shop-product
+          predicates:
+            - Path=/images/**
+          filters:
+            - StripPrefix=0
+
+        - id: shop-order
+          uri: lb://shop-order
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=1
+
+        - id: shop-payment
+          uri: lb://shop-payment
+          predicates:
+            - Path=/api/payment/**
+          filters:
+            - StripPrefix=1
+
+        - id: shop-cart
+          uri: lb://shop-cart
+          predicates:
+            - Path=/api/cart/**
+          filters:
+            - StripPrefix=1
+
+        - id: shop-after-sale
+          uri: lb://shop-after-sale
+          predicates:
+            - Path=/api/after-sale/**
+          filters:
+            - StripPrefix=1
+
+        - id: shop-express
+          uri: lb://shop-express
+          predicates:
+            - Path=/api/express/**
+          filters:
+            - StripPrefix=1
+
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8719
+      datasource:
+        ds1:
+          flow:
+            rule-type: flow
+
+  config:
+    import: "optional:nacos:"
+
+logging:
+  level:
+    root: INFO
+    com.delmon: DEBUG
+    org.springframework.cloud.gateway: DEBUG

@@ -1,0 +1,37 @@
+server:
+  port: 8004
+
+spring:
+  application:
+    name: shop-payment
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/db_payment?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    com.delmon: debug
+
+# 支付宝配置
+alipay:
+  app-id: 9021000163632997
+  private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCZWx3/rjAWKLP3K33VKIiOhdLj80c8sbiu81V4nR8a4En6j6+T55rjGRzG6+ezW7JEshY4EBnrUZhlVDs+9NfoSmXoEfkiupB5c5wOaCfRTMuFETtDlPwl8dIB+jQ8xl58ZQX1ziGi/Kz75SMVGXDLjQjqg+Bsk+d7UII5+YQauhx/D/fQqSsKdiGiIeinnPV+LOsuvKHdjJ735zNXRhMd4UeJOYhCXbvlHWuExaWyPQSAJkSHjRcVeN7or1WUhZyYBav8nOt6QbIv1yI/T/MfcrYSll29hYOpIniji7MkgBqZcPBpYtqTIzZhmZBEnY4L/fQ3ODUsze5AwACSam4lAgMBAAECggEAD+7Ykgzt8A9wiziYjUH11iDvRUGsYBDy6DJd6fchGTC+Xur4yfwhKoEcbUprO0ZGoj6CcnaxyrIijDyRHzxfBkJcjhz37nTFt+icCR8nK+a3qm6c4qui+upB8HSnYr0VagUw9lXhRsbLziwDVhjbkDpp97uV4JIJVdWKgi17XS9ZWbKhUWbaL520ZogINudSbV1uhCRqqcdX2X49A5Y947Y+JhT2PoZTd0Do4asn+8aLutkffCB/2mm+Rkbyyd+W4UO/AsHAYee0DtjfMLIIOV/ObYERzfFolFUPpg9XYZnj52TI8O+GkYgXLWeMkHWpnLlceODemXL1q62RKXD6oQKBgQDkbVTE9z5uhdeuk7yy1KRUqb/kBCGbWM4ooMmttuip67e/bsJsP+KzKSePJSQYBNrNQxEMriFf99742cSpfW4uMJlQkfGQ3cKxf6YMPV2vFQktITl3hw3MsaCRgOjYZfBmYYgb6cHLdO0R/Hek9R1dzZSt9EgxqcCkRRneKEyojQKBgQCr3f+DJ+nn7OFfO8vvhQMHvtAQUY8Tq5TuZQXkTZDmvC1L73zGO2GoAx4ymZrMiuMUjyAvHglS7BAnZs+P5iApwb78UG90yrzQZILSMsbhq725BKGw0vooXrm8TrNX1S9JF9AnVf3K6hOtJ8iztC2CYR1SDto6F1orxLXbKtWx+QKBgDqayjrWbBATCqjhgnInGBoYiwDHBpBCknHd/qAw4zRlI3lbw0negh0RG/MfxkjbRf+Pi1pDepCSmYQi6s/JPHFhSpRfPSi7nG3JoCJXxCddMEOB2KqP3bx8fgOWnSaX0LuTnkX7DRtT3lbU/SU3NdeRHOocWEFVmfULPX2/vRspAoGBAIFVcECcurLjWb4224MFj4A2oZCGL6tXxZ2YvFRP4qkgFt47/KOYcCblIcZmPU2LftMr2cZbThzutEFSZwQc4ztJJ5XsWdOD9Y7E9IWF3JBak002JQ9R1RqoHhGND/0a2pigqO3REkmu2NvHQoupHU4uEsh7kNGCXULupwOlOmbRAoGBAOBef3YqZvDtkbE0TUp2a6JjF8jxdUwKDQmQGd7NCsbHlavrbCoGg4NMZHGG7OOs3tBBFNqDSXgx8zU6E31DMuudbY5fkhCh4kt21mPnbkS5vVZIKetXDqNApPtUl/pWJRsGH0tK9KmBgZKRG3poIfpZFCh9X7efST4+Or9ISxF2
+  public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgh6yy/8jM7Hh3OgrMgdsLJXb5T7DK4fG2ZWUH4PyqaKhEEjRJPMrGjqLRoLyqjIGE0Zs7ax1Ebr4R6O3g5Ukhr3TenTgAhaIbHoR4LdSYpn9C+8Th/Os1NKtKiUHelJlBPf1HXhP008Ma2hzw9PXLi+cmP9k3Cl6dILRKzA8ysGWIL6li4Zkc/Qlkl7TtxQ9paU/NN+LCl3Aq8CcsrEZS1LbMUMdwC3hsqaypeom+aSGMKosnB65EKQac7OEdtdbzxEVcqgGdDtrjtsP+OChQFQ7qux6YCsOvyU7fjIP7/1nQKgxh/0eopRJ47qmRvHdPz8FAWwLUqlU2EO2t9ud7QIDAQAB
+  gateway-url: https://openapi.alipaydev.com/gateway.do  # 沙箱环境
+  # gateway-url: https://openapi.alipay.com/gateway.do   # 正式环境
+  notify-url: http://你的域名/payment/alipay/notify
+  return-url: http://你的域名/payment/alipay/return
