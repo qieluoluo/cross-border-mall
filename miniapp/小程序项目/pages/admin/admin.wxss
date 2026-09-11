@@ -1,0 +1,75 @@
+/* pages/admin/admin.wxss */
+page {
+  background-color: #f8f8f8;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  min-height: 100vh;
+}
+
+.admin-header {
+  padding: 20rpx 30rpx;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.welcome {
+  font-size: 48rpx; /* 字体加大 */
+  color: #333;
+  font-weight: bold;
+}
+
+.menu-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30rpx;
+  padding: 60rpx 30rpx;
+}
+
+.menu-item {
+  width: 300rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 60rpx 0;
+  text-align: center;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+
+.menu-item:active {
+  transform: scale(0.96);
+  background: #f9f9f9;
+}
+
+.menu-icon {
+  font-size: 70rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.menu-text {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.logout-btn {
+  background: #fff;
+  color: #ff6b6b;
+  text-align: center;
+  padding: 28rpx;
+  border-radius: 24rpx;
+  margin: 60rpx 30rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: 1rpx solid #ffe6e6;
+  transition: all 0.2s;
+}
+
+.logout-btn:active {
+  background: #fff5f5;
+  transform: scale(0.98);
+}

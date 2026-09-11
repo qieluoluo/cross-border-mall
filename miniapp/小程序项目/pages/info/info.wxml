@@ -1,0 +1,107 @@
+<!--pages/info/info.wxml-->
+<view class="container">
+  <!-- 标签页 -->
+  <view class="tabs" style="width: 462rpx; display: flex; box-sizing: border-box; left: NaNrpx; top: 0rpx">
+    <view class="tab {{activeTab === 'user' ? 'active' : ''}}" data-tab="user" bindtap="switchTab">个人信息</view>
+    <view class="tab {{activeTab === 'address' ? 'active' : ''}}" data-tab="address" bindtap="switchTab">收货地址</view>
+  </view>
+
+  <!-- 个人信息 -->
+  <view class="tab-content" wx:if="{{activeTab === 'user'}}" style="width: 591rpx; display: block; box-sizing: border-box">
+    <view class="form-group">
+      <text class="label">昵称</text>
+      <input class="input" value="{{userInfo.nickname}}" placeholder="请输入昵称" bindinput="onNicknameInput" />
+    </view>
+    
+    <view class="form-group">
+      <text class="label">手机号</text>
+      <input class="input" value="{{userInfo.phone}}" placeholder="请输入手机号" bindinput="onPhoneInput" />
+    </view>
+    
+    <view class="form-group">
+      <text class="label">邮箱</text>
+      <input class="input" value="{{userInfo.email}}" placeholder="请输入邮箱" bindinput="onEmailInput" />
+    </view>
+
+    <button class="save-btn" bindtap="saveInfo">保存修改</button>
+  </view>
+
+  <!-- 地址列表 -->
+  <view class="tab-content" wx:if="{{activeTab === 'address'}}">
+    <!-- 添加地址按钮 -->
+    <view class="add-btn" bindtap="addAddress">
+      <text class="add-icon">+</text>
+      <text>添加新地址</text>
+    </view>
+
+    <!-- 地址列表 -->
+    <view class="address-list">
+      <view class="address-item" wx:for="{{addressList}}" wx:key="id">
+        <view class="address-top">
+          <text class="receiver">{{item.receiverName}}</text>
+          <text class="phone">{{item.receiverPhone}}</text>
+          <view class="default-tag" wx:if="{{item.isDefault === 1}}">默认</view>
+        </view>
+        <view class="address-detail">
+          {{item.province}}{{item.city}}{{item.district}}{{item.detailAddress}}
+        </view>
+        <view class="address-actions">
+          <view class="action-btn" wx:if="{{item.isDefault !== 1}}" data-id="{{item.id}}" bindtap="setDefaultAddress">设为默认</view>
+          <view class="action-btn" data-address="{{item}}" bindtap="editAddress">编辑</view>
+          <view class="action-btn delete" data-id="{{item.id}}" bindtap="deleteAddress">删除</view>
+        </view>
+      </view>
+
+      <view class="empty-tip" wx:if="{{addressList.length === 0}}">
+        暂无收货地址
+      </view>
+    </view>
+  </view>
+
+  <!-- 地址编辑弹窗 -->
+  <view class="edit-modal" wx:if="{{isEditAddress}}">
+    <view class="modal-content">
+      <view class="modal-title">{{editMode === 'add' ? '添加地址' : '编辑地址'}}</view>
+      
+      <view class="form-group">
+        <text class="label">收货人</text>
+        <input class="input" value="{{currentAddress.receiverName}}" placeholder="请输入收货人姓名" data-field="receiverName" bindinput="onAddressInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="label">手机号</text>
+        <input class="input" value="{{currentAddress.receiverPhone}}" placeholder="请输入手机号" data-field="receiverPhone" bindinput="onAddressInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="label">省</text>
+        <input class="input" value="{{currentAddress.province}}" placeholder="请输入省份" data-field="province" bindinput="onAddressInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="label">市</text>
+        <input class="input" value="{{currentAddress.city}}" placeholder="请输入城市" data-field="city" bindinput="onAddressInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="label">区/县</text>
+        <input class="input" value="{{currentAddress.district}}" placeholder="请输入区/县" data-field="district" bindinput="onAddressInput" />
+      </view>
+      
+      <view class="form-group">
+        <text class="label">详细地址</text>
+        <input class="input" value="{{currentAddress.detailAddress}}" placeholder="请输入详细地址" data-field="detailAddress" bindinput="onAddressInput" />
+      </view>
+      
+      <view class="form-group checkbox-group" bindtap="toggleDefault">
+        <text class="label">设为默认地址</text>
+        <checkbox checked="{{currentAddress.isDefault === 1}}" />
+      </view>
+
+      <view class="modal-buttons">
+        <button class="cancel-btn" bindtap="cancelEditAddress">取消</button>
+        <button class="save-btn" bindtap="saveAddress">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

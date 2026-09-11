@@ -1,0 +1,91 @@
+/* pages/logistics/logistics.wxss */
+page {
+  background: #f5f5f5;
+}
+
+.container {
+  padding: 0;
+  min-height: 100vh;
+}
+
+.card {
+  background: #fff;
+  padding: 40rpx 30rpx;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20rpx;
+}
+
+.status {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ff6b6b;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.company, .number {
+  font-size: 30rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.timeline {
+  margin-top: 40rpx;
+  padding-left: 20rpx;
+}
+
+.timeline-item {
+  display: flex;
+  margin-bottom: 40rpx;
+  position: relative;
+}
+
+.timeline-item:last-child .dot::after {
+  display: none;
+}
+
+.dot {
+  width: 20rpx;
+  height: 20rpx;
+  background: #ff6b6b;
+  border-radius: 50%;
+  margin-right: 30rpx;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.dot::after {
+  content: '';
+  position: absolute;
+  top: 20rpx;
+  left: 8rpx;
+  width: 4rpx;
+  height: 80rpx;
+  background: #e0e0e0;
+}
+
+.content {
+  flex: 1;
+}
+
+.time {
+  font-size: 24rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.desc {
+  font-size: 28rpx;
+  color: #333;
+  display: block;
+  line-height: 1.5;
+}
+
+.empty {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}

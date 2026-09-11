@@ -1,0 +1,126 @@
+/* pages/user/user.wxss */
+
+/* 强制页面0边距，背景色 */
+page {
+  background-color: #f8f8f8;
+  margin: 0;
+  padding: 0;
+}
+
+/* 外层容器 */
+.container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  /* 关键：为固定定位的红色卡片让出空间，数值需大于红色卡片实际高度 */
+  /* 红色卡片高度估算：上下padding 60+50=110rpx，内容约140rpx，总计约250rpx，加安全区 */
+  /* 设 padding-top 为 280rpx，可根据需要调大（数值越大，菜单越靠下，与红条间距越大） */
+  padding-top: 280rpx;
+  box-sizing: border-box;
+}
+
+/* 红色用户卡片：固定贴顶 */
+.user-card {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  margin: 0;
+  padding: 60rpx 40rpx 50rpx 40rpx;
+  border-radius: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 40rpx;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  /* 适配刘海屏安全区顶部 */
+  padding-top: calc(60rpx + constant(safe-area-inset-top));
+  padding-top: calc(60rpx + env(safe-area-inset-top));
+}
+
+/* 头像区域 */
+.avatar-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  border: 6rpx solid rgba(255,255,255,0.4);
+  box-shadow: 0 8rpx 20rpx rgba(0,0,0,0.15);
+}
+
+.avatar-tip {
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.8);
+}
+
+/* 昵称区域 */
+.nickname-area {
+  flex: 1;
+}
+
+.nickname {
+  font-size: 40rpx;
+  color: #fff;
+  font-weight: bold;
+  display: block;
+}
+
+.edit-tip {
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.8);
+  margin-top: 12rpx;
+  display: block;
+}
+
+/* 菜单项样式 */
+.menu-item {
+  background: #fff;
+  margin: 0 24rpx 24rpx;
+  padding: 32rpx 36rpx;
+  border-radius: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4rpx 15rpx rgba(0,0,0,0.03);
+  transition: all 0.2s;
+}
+
+.menu-item:active {
+  background: #f9f9f9;
+  transform: scale(0.98);
+}
+
+.menu-item text:first-child {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.arrow {
+  color: #ccc;
+  font-size: 40rpx;
+  font-weight: 300;
+}
+
+/* 版本信息 */
+.version {
+  text-align: center;
+  padding: 60rpx 0 80rpx;
+  font-size: 26rpx;
+  color: #bbb;
+}/* 原有样式保持不变，仅在最末尾添加 .spacer 的定义 */
+
+.spacer {
+  width: 100%;
+  height: 200rpx;          /* 这个高度控制间隔大小，您可随意调整（越大越分开） */
+  background-color: transparent;  /* 完全透明，看不见但起到物理隔开作用 */
+  /* 如果您想看到一条有色长条，可以把 transparent 改成 #f0f0f0 或任意颜色 */
+}

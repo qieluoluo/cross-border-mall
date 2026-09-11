@@ -1,0 +1,22 @@
+<!-- pages/logistics/logistics.wxml -->
+<view class="container">
+  <view class="card" wx:if="{{logisticsInfo}}">
+    <view class="status">物流状态：{{logisticsInfo.status || '配送中'}}</view>
+    <view class="company">快递公司：{{logisticsInfo.company || '未知'}}</view>
+    <view class="number">快递单号：{{logisticsInfo.number}}</view>
+    
+    <view class="timeline">
+      <view class="timeline-item" wx:for="{{logisticsInfo.traces}}" wx:key="index">
+        <view class="dot"></view>
+        <view class="content">
+          <text class="time">{{item.time}}</text>
+          <text class="desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:else>
+    <text>暂无物流信息</text>
+  </view>
+</view>

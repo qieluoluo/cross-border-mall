@@ -1,0 +1,80 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  
+  <block wx:if="{{loginType === 'admin'}}">
+    <view class="login-box">
+      <view class="admin-icon">🔐</view>
+      <text class="title">管理员登录</text>
+      <input class="input" placeholder="用户名" placeholder-class="placeholder" bindinput="onUsernameInput" />
+      <input class="input" placeholder="密码" password placeholder-class="placeholder" bindinput="onPasswordInput" />
+      <button class="login-btn" bindtap="doLogin">登 录</button>
+      <text class="result">{{result}}</text>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="search-box" style="width: 554rpx; display: flex; box-sizing: border-box; height: 72rpx">
+      <text class="search-icon">🔍</text>
+      <input 
+        placeholder="搜索商品..." 
+        placeholder-class="placeholder"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        confirm-type="search"
+      />
+    </view>
+
+    <view class="banner">
+      <text class="banner-text">限时特惠 全场包邮</text>
+    </view>
+
+    <view class="section-title">
+      <text>🔥 热门推荐</text>
+    </view>
+
+    <!-- 搜索结果只有1个时：大卡片模式 -->
+    <view class="single-result" wx:if="{{displayProductList.length === 1}}">
+      <view class="single-card" bindtap="goToDetail" data-id="{{displayProductList[0].id}}">
+        <view class="single-img-wrapper">
+          <image class="single-img" src="{{displayProductList[0].mainImage || 'http://localhost:8888/images/iphone.png'}}" mode="aspectFill" lazy-load></image>
+          <view class="product-tag">热卖</view>
+        </view>
+        <view class="single-info">
+          <text class="single-name">{{displayProductList[0].name}}</text>
+          <text class="single-price">¥{{displayProductList[0].price}}</text>
+          <view class="single-sales">月销 {{displayProductList[0].sales || 100}}+</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 搜索结果0个或多于1个：两列网格布局 -->
+    <view class="product-list" wx:elif="{{displayProductList.length !== 1}}">
+      <block wx:for="{{displayProductList}}" wx:key="id">
+        <view class="product-card" bindtap="goToDetail" data-id="{{item.id}}">
+          <view class="product-img-wrapper">
+            <image class="product-img" src="{{item.mainImage || 'http://localhost:8888/images/iphone.png'}}" mode="aspectFill" lazy-load></image>
+            <view class="product-tag" wx:if="{{index < 3}}">热卖</view>
+          </view>
+          <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-price">¥{{item.price}}</text>
+            <view class="product-sales">月销 {{item.sales || 100}}+</view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 无搜索结果 -->
+    <view class="empty-search" wx:if="{{displayProductList.length === 0 && searchKeyword !== ''}}">
+      <text>😢 没有找到相关商品</text>
+    </view>
+
+    <view class="load-more" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+    <view class="load-more" wx:elif="{{noMore && productList.length > 0}}">
+      <text>没有更多了</text>
+    </view>
+  </block>
+</view>

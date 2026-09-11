@@ -1,0 +1,33 @@
+<!-- pages/admin/create/create.wxml -->
+<view class="page">
+  <view class="form-card">
+    <!-- 用户名 -->
+    <view class="form-field">
+      <view class="field-icon">👤</view>
+      <input class="field-input" placeholder="用户名" placeholder-class="placeholder" bindinput="onUsernameInput" />
+    </view>
+
+    <!-- 密码 -->
+    <view class="form-field">
+      <view class="field-icon">🔒</view>
+      <input class="field-input" placeholder="密码" password placeholder-class="placeholder" bindinput="onPasswordInput" />
+    </view>
+
+    <!-- 真实姓名 -->
+    <view class="form-field">
+      <view class="field-icon">📛</view>
+      <input class="field-input" placeholder="真实姓名" placeholder-class="placeholder" bindinput="onRealNameInput" />
+    </view>
+
+    <!-- 角色选择 -->
+    <view class="form-field picker-field" bindtap="showRolePicker">
+      <view class="field-icon">👥</view>
+      <view class="field-input picker-text">
+        {{selectedRoleName || '请选择角色'}}
+      </view>
+      <view class="picker-arrow">›</view>
+    </view>
+  </view>
+
+  <button class="submit-btn" bindtap="createAdmin">+ 添加管理员</button>
+</view>

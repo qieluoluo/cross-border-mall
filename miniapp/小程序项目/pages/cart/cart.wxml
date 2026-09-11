@@ -1,0 +1,111 @@
+<!-- pages/cart/cart.wxml -->
+<view class="container">
+  <!-- 购物车有商品时显示 -->
+  <block wx:if="{{cartList.length > 0}}">
+    <!-- 商品列表 -->
+    <view class="cart-list">
+      <view class="cart-item" wx:for="{{cartList}}" wx:key="id">
+        <image class="item-image" src="{{item.productImage}}" mode="aspectFill"></image>
+        <view class="item-info">
+          <text class="item-name">{{item.productName}}</text>
+          <text class="item-price">¥{{item.price}}</text>
+        </view>
+        <view class="item-quantity">
+          <view class="quantity-btn sub" bindtap="subQuantity" data-id="{{item.id}}">-</view>
+          <text class="quantity-num">{{item.quantity}}</text>
+          <view class="quantity-btn add" bindtap="addQuantity" data-id="{{item.id}}">+</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部结算栏 -->
+    <view class="total-bar">
+      <view class="total-info">
+        <text class="total-label">合计：</text>
+        <text class="total-price">¥{{totalPrice}}</text>
+      </view>
+      <button class="checkout-btn" bindtap="openCheckoutModal">去结算</button>
+    </view>
+  </block>
+  
+  <!-- 购物车为空时显示 -->
+  <view class="empty-cart" wx:else>
+    <image class="empty-icon" src="/images/empty-cart.png" mode="aspectFit"></image>
+    <text class="empty-text">🛒 购物车空空如也~</text>
+    <button class="go-shopping-btn" bindtap="goToHome">去逛逛</button>
+  </view>
+</view>
+
+<!-- 结算弹窗 -->
+<view class="modal-mask" wx:if="{{showCheckoutModal}}" bindtap="closeCheckoutModal">
+  <view class="modal-container" bindtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">确认订单</text>
+      <text class="modal-close" bindtap="closeCheckoutModal">✕</text>
+    </view>
+    
+    <view class="modal-content">
+      <!-- 收货地址 -->
+      <view class="address-section" bindtap="selectAddress">
+        <view class="address-icon">📍</view>
+        <view class="address-info" wx:if="{{selectedAddress}}">
+          <text class="address-name">{{selectedAddress.receiverName}}</text>
+          <text class="address-phone">{{selectedAddress.receiverPhone}}</text>
+          <text class="address-detail">{{selectedAddress.province}}{{selectedAddress.city}}{{selectedAddress.district}}{{selectedAddress.detailAddress}}</text>
+        </view>
+        <view class="address-empty" wx:else>
+          <text>请选择收货地址</text>
+        </view>
+        <view class="address-arrow">></view>
+      </view>
+      
+      <!-- 商品列表 -->
+      <view class="order-items">
+        <view class="order-item" wx:for="{{cartList}}" wx:key="id">
+          <image class="order-item-image" src="{{item.productImage}}" mode="aspectFill"></image>
+          <view class="order-item-info">
+            <text class="order-item-name">{{item.productName}}</text>
+            <text class="order-item-price">¥{{item.price}}</text>
+          </view>
+          <text class="order-item-quantity">x{{item.quantity}}</text>
+        </view>
+      </view>
+      
+      <!-- 总金额 -->
+      <view class="order-total">
+        <text>共{{cartList.length}}件商品</text>
+        <text>合计：¥{{totalPrice}}</text>
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="cancel-btn" bindtap="closeCheckoutModal">取消</button>
+      <button class="confirm-btn" bindtap="confirmOrder">确认下单</button>
+    </view>
+  </view>
+</view>
+
+<!-- 地址选择器弹窗 -->
+<view class="modal-mask" wx:if="{{showAddressPicker}}" bindtap="closeAddressPicker">
+  <view class="address-picker-container" bindtap="stopPropagation">
+    <view class="picker-header">
+      <text class="picker-title">选择收货地址</text>
+      <text class="picker-close" bindtap="closeAddressPicker">✕</text>
+    </view>
+    
+    <scroll-view class="address-list" scroll-y>
+      <view class="address-item" wx:for="{{addressList}}" wx:key="id" bindtap="confirmSelectAddress" data-address="{{item}}">
+        <view class="address-info">
+          <text class="address-name">{{item.receiverName}}</text>
+          <text class="address-phone">{{item.receiverPhone}}</text>
+          <text class="address-detail">{{item.province}}{{item.city}}{{item.district}}{{item.detailAddress}}</text>
+        </view>
+        <view class="address-check" wx:if="{{selectedAddress && selectedAddress.id === item.id}}">✓</view>
+      </view>
+    </scroll-view>
+    
+    <view class="picker-footer">
+      <button class="add-address-btn" bindtap="addNewAddress">+ 新增地址</button>
+    </view>
+  </view>
+</view>

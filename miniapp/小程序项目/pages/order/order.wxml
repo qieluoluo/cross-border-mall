@@ -1,0 +1,42 @@
+<!-- pages/order/order.wxml -->
+<view class="container">
+  <block wx:if="{{orderList.length > 0}}">
+    <view class="order-item" wx:for="{{orderList}}" wx:key="id">
+      <view class="order-header">
+        <text>订单号：{{item.orderNo}}</text>
+        <text class="status">
+          {{item.status === 0 ? '待付款' : 
+            item.status === 1 ? '商家处理中' :
+            item.status === 2 ? '商家已发货' :
+            item.status === 3 ? '已完成' :
+            item.status === 4 ? '已取消' : '退款中'}}
+        </text>
+      </view>
+      <view class="order-goods">
+        <block wx:if="{{item.items && item.items.length > 0}}">
+          <view class="goods-info" wx:for="{{item.items}}" wx:key="id" wx:for-item="goods">
+            <text class="goods-name">{{goods.productName || '商品'}}</text>
+            <text class="goods-price">¥{{goods.price}}</text>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="goods-info">
+            <text class="goods-name">商品</text>
+            <text class="goods-price">¥{{item.totalAmount}}</text>
+          </view>
+        </block>
+      </view>
+      <view class="order-footer">
+        <text>共{{item.items ? item.items.length : 1}}件 实付：¥{{item.payAmount || item.totalAmount}}</text>
+        <view class="btn-group">
+          <!-- 去支付：只有待付款(0)才显示 -->
+          <button class="pay-btn" size="mini" bindtap="goPay" data-order-id="{{item.id}}" data-total-price="{{item.payAmount || item.totalAmount}}" wx:if="{{item.status === 0}}">去支付</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty-order" wx:else>
+    <text>暂无订单</text>
+  </view>
+</view>

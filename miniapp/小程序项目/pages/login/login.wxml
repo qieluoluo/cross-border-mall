@@ -1,0 +1,23 @@
+<!-- pages/login/login.wxml -->
+<view class="container">
+  <view class="logo">🛒</view>
+  <view class="title">{{isRegisterMode ? '用户注册' : '购物商城'}}</view>
+  
+  <input class="input" placeholder="请输入用户名" bindinput="onUsernameInput" />
+  <input class="input" placeholder="请输入密码" password bindinput="onPasswordInput" />
+  
+  <!-- 注册模式下显示手机号输入框 -->
+  <input wx:if="{{isRegisterMode}}" class="input" placeholder="请输入手机号" bindinput="onPhoneInput" />
+  
+  <!-- 注册模式 -->
+  <block wx:if="{{isRegisterMode}}">
+    <button class="login-btn" bindtap="doRegister">注册</button>
+    <button class="register-btn" bindtap="goLogin">返回登录</button>
+  </block>
+  
+  <!-- 登录模式 -->
+  <block wx:else>
+    <button class="login-btn" bindtap="doLogin">登录</button>
+    <button class="register-btn" bindtap="goRegister">注册账号</button>
+  </block>
+</view>

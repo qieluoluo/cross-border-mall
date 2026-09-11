@@ -1,0 +1,20 @@
+<!-- pages/admin/admin.wxml -->
+<view class="container">
+  <view class="admin-header">
+    <text class="welcome">欢迎，{{adminInfo.realName || adminInfo.username}}</text>
+  </view>
+
+  <view class="menu-grid">
+    <view class="menu-item" bindtap="goToAdminList">
+      <text class="menu-icon">👥</text>
+      <text class="menu-text">管理员列表</text>
+    </view>
+    
+    <view class="menu-item" bindtap="createAdmin">
+      <text class="menu-icon">➕</text>
+      <text class="menu-text">添加管理员</text>
+    </view>
+  </view>
+
+  <view class="logout-btn" bindtap="logout">退出登录</view>
+</view>

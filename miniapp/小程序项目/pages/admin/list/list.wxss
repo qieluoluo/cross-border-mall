@@ -1,0 +1,154 @@
+/* pages/admin/list/list.wxss */
+
+page, .page {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #f5f7fa;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 20px;
+}
+
+/* ===== 搜索栏 ===== */
+.search-area {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
+  margin: 0;
+  background: #f5f7fa;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.search-input {
+  flex: 1;
+  background: white;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 30px;
+  font-size: 15px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.search-button {
+  width: 90px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 14px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: none;
+  line-height: 1;
+  box-shadow: 0 4px 10px rgba(102,126,234,0.3);
+}
+
+/* ===== 列表 ===== */
+.list {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* 卡片 - 左右贴边 */
+.card {
+  background: white;
+  margin: 0 0 8px 0;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid #efefef;
+}
+
+.card-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.card-info {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a2c3e;
+}
+
+.real {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 14px;
+  border-radius: 30px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge-on {
+  background: #e3f7ec;
+  color: #2e7d32;
+  border: 1px solid #b8dfc2;
+}
+
+.badge-off {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* ===== 操作按钮 ===== */
+.action-btn {
+  width: 80px;
+  height: 38px;
+  font-size: 14px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.btn-disable {
+  background: #ff4d4f;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255,77,79,0.3);
+}
+
+.btn-enable {
+  background: #52c41a;
+  color: white;
+  box-shadow: 0 2px 8px rgba(82,196,26,0.3);
+}
+
+.status-tip {
+  text-align: center;
+  padding: 60px 20px;
+  color: #aaa;
+  font-size: 14px;
+}

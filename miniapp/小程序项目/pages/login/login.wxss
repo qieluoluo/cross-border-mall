@@ -1,0 +1,36 @@
+/* pages/login/login.wxss */
+page {
+  background: #fff;
+}
+.container {
+  padding: 100rpx 50rpx;
+  text-align: center;
+}
+.logo {
+  font-size: 120rpx;
+}
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin: 30rpx 0 80rpx;
+}
+.input {
+  border: 1px solid #eee;
+  border-radius: 60rpx;
+  padding: 25rpx 40rpx;
+  margin-bottom: 30rpx;
+  font-size: 30rpx;
+}
+.login-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  color: #fff;
+  border-radius: 60rpx;
+  margin-top: 40rpx;
+}
+.register-btn {
+  background: #fff;
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+  border-radius: 60rpx;
+  margin-top: 20rpx;
+}

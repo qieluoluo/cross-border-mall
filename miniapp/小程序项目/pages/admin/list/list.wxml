@@ -1,0 +1,32 @@
+<!-- pages/admin/list/list.wxml -->
+<view class="page">
+  <!-- 搜索栏 -->
+  <view class="search-area">
+    <input class="search-input" placeholder="搜索用户名/姓名" bindinput="onSearchInput" />
+    <button class="search-button" bindtap="searchAdmin">搜索</button>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list">
+    <view class="card" wx:for="{{displayList}}" wx:key="id">
+      <view class="card-left">
+        <view class="card-info">
+          <text class="name">{{item.username}}</text>
+          <text class="real">{{item.realName}}</text>
+        </view>
+        <view class="badge {{item.status === 1 ? 'badge-on' : 'badge-off'}}">
+          {{item.status === 1 ? '已启用' : '已禁用'}}
+        </view>
+      </view>
+      <button class="action-btn {{item.status === 1 ? 'btn-disable' : 'btn-enable'}}" 
+              bindtap="toggleStatus" 
+              data-id="{{item.id}}" 
+              data-status="{{item.status}}">
+        {{item.status === 1 ? '禁用' : '启用'}}
+      </button>
+    </view>
+  </view>
+
+  <view class="status-tip" wx:if="{{loading}}">⏳ 加载中...</view>
+  <view class="status-tip" wx:if="{{!loading && displayList.length === 0}}">📭 暂无数据</view>
+</view>
