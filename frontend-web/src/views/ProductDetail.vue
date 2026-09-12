@@ -1,81 +1,76 @@
 <template>
-  <div class="bg-white p-6">
-    <div v-if="productNotFound" class="text-center py-16">
-      <svg class="w-24 h-24 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div class="bg-white p-5 sm:p-8">
+    <div v-if="productNotFound" class="py-20 text-center">
+      <svg class="mx-auto h-24 w-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>
-      <h2 class="text-2xl font-bold text-gray-800 mt-4">商品不存在</h2>
-      <p class="text-gray-500 mt-2">该商品可能已被删除或不存在</p>
-      <button
-          @click="goBack"
-          class="mt-6 bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition"
-      >
+      <h2 class="mt-4 text-2xl font-bold text-gray-800">商品不存在</h2>
+      <p class="mt-2 text-gray-500">该商品可能已被删除或不存在</p>
+      <button @click="goBack" class="mt-6 bg-orange-500 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-orange-600">
         返回商品列表
       </button>
     </div>
 
-    <div v-else-if="loading" class="text-center py-16">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-      <p class="text-gray-500 mt-4">加载中...</p>
+    <div v-else-if="loading" class="py-20 text-center">
+      <div class="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-orange-500"></div>
+      <p class="mt-4 text-gray-500">加载中...</p>
     </div>
 
-    <div v-else-if="product" class="flex">
-      <div class="w-1/2">
+    <div v-else-if="product" class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+      <div class="overflow-hidden bg-gray-100">
         <img
             :src="getProductImage(product)"
+            @error="applyImageFallback"
             :alt="product.name"
-            class="w-full h-96 object-cover rounded-lg"
+            class="h-80 w-full object-cover sm:h-[30rem]"
         />
       </div>
 
-      <div class="w-1/2 pl-8">
-        <h1 class="text-2xl font-bold text-gray-800">{{ product.name }}</h1>
-        <p class="text-gray-500 mt-2">{{ product.subTitle || product.description }}</p>
-        <p class="text-orange-500 text-3xl font-bold mt-4">¥{{ product.price }}</p>
-
-        <div class="mt-6">
-          <span class="text-gray-600">销量：</span>
-          <span class="text-gray-800">{{ product.sales || 0 }}</span>
-          <span class="text-gray-400 ml-4">库存：</span>
-          <span class="text-gray-800">{{ product.stock || 0 }}</span>
+      <div class="flex flex-col py-1">
+        <p class="text-sm font-medium text-orange-600">精选商品</p>
+        <h1 class="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">{{ product.name }}</h1>
+        <p class="mt-3 leading-6 text-gray-500">{{ product.subTitle || product.description || '优选品质，为日常生活带来更多便利。' }}</p>
+        <div class="mt-6 border-y border-gray-200 bg-orange-50 px-5 py-4">
+          <span class="text-sm text-gray-500">售价</span>
+          <p class="mt-1 text-3xl font-bold text-orange-600">¥{{ product.price }}</p>
         </div>
 
-        <div class="mt-8">
-          <span class="text-gray-600">数量：</span>
-          <div class="inline-flex items-center border border-gray-300">
-            <button
-                @click="quantity = Math.max(1, quantity - 1)"
-                class="w-10 h-10 flex items-center justify-center hover:bg-gray-100"
-            >-</button>
-            <span class="w-10 text-center">{{ quantity }}</span>
-            <button
-                @click="quantity = Math.min(product.stock || 999, quantity + 1)"
-                class="w-10 h-10 flex items-center justify-center hover:bg-gray-100"
-            >+</button>
+        <div class="mt-6 grid grid-cols-2 divide-x divide-gray-200 border-y border-gray-200 py-4 text-center">
+          <div>
+            <p class="text-sm text-gray-500">累计销量</p>
+            <p class="mt-1 font-semibold text-gray-900">{{ product.sales || 0 }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">当前库存</p>
+            <p class="mt-1 font-semibold text-gray-900">{{ product.stock || 0 }}</p>
           </div>
         </div>
 
-        <div class="mt-8 flex space-x-4">
-          <button
-              @click="addToCart"
-              class="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition font-medium"
-          >
+        <div class="mt-7 flex items-center gap-4">
+          <span class="text-sm text-gray-600">购买数量</span>
+          <div class="inline-flex items-center border border-gray-300 bg-white">
+            <button @click="quantity = Math.max(1, quantity - 1)" class="flex h-10 w-10 items-center justify-center text-lg text-gray-600 transition hover:bg-gray-100">-</button>
+            <span class="w-10 text-center text-sm font-medium">{{ quantity }}</span>
+            <button @click="quantity = Math.min(product.stock || 999, quantity + 1)" class="flex h-10 w-10 items-center justify-center text-lg text-gray-600 transition hover:bg-gray-100">+</button>
+          </div>
+        </div>
+
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <button @click="addToCart" class="border border-orange-500 bg-orange-50 px-8 py-3 font-medium text-orange-600 transition hover:bg-orange-100">
             加入购物车
           </button>
-          <button
-              @click="buyNow"
-              class="bg-red-500 text-white px-8 py-3 rounded-lg hover:bg-red-600 transition font-medium"
-          >
+          <button @click="buyNow" class="bg-orange-500 px-8 py-3 font-medium text-white transition hover:bg-orange-600">
             立即购买
           </button>
         </div>
       </div>
     </div>
 
-    <div v-if="product" class="mt-12">
-      <h2 class="text-xl font-bold mb-4">商品详情</h2>
-      <div class="border-t pt-4">
-        <p class="text-gray-600 leading-relaxed">{{ product.detailHtml || product.description || '暂无详细描述' }}</p>
+    <div v-if="product" class="mt-12 border-t border-gray-200 pt-8">
+      <p class="text-sm font-medium text-orange-600">商品信息</p>
+      <h2 class="mt-1 text-xl font-bold text-gray-900">商品详情</h2>
+      <div class="mt-5 max-w-3xl border-l-2 border-orange-400 pl-4">
+        <p class="leading-8 text-gray-600">{{ product.detailHtml || product.description || '暂无详细描述' }}</p>
       </div>
     </div>
   </div>
@@ -86,6 +81,7 @@ import { ref, onMounted } from 'vue'
 import { productAPI, cartAPI } from '../api'
 import { useRoute, useRouter } from 'vue-router'
 import { getProductImage } from '../utils/image'
+import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -152,6 +148,11 @@ const buyNow = () => {
   }).catch(() => {
     alert('添加商品失败')
   })
+}
+
+const applyImageFallback = (event) => {
+  event.target.onerror = null
+  event.target.src = fallbackProductImage
 }
 
 onMounted(() => {

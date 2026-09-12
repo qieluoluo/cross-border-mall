@@ -1,42 +1,46 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-white rounded-lg shadow-lg p-8 w-96">
-      <h2 class="text-2xl font-bold text-center mb-6">登录</h2>
-      
-      <form @submit.prevent="handleLogin">
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm mb-2">用户名</label>
-          <input 
-            v-model="username" 
-            type="text" 
+  <div class="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-10">
+    <section class="w-full max-w-md border border-gray-200 bg-white p-6 shadow-xl sm:p-9">
+      <div class="border-b border-gray-200 pb-6">
+        <router-link to="/" class="text-lg font-bold text-orange-600">Bundaberg</router-link>
+        <p class="mt-5 text-sm font-medium text-orange-600">欢迎回来</p>
+        <h1 class="mt-1 text-2xl font-bold text-gray-900">登录账户</h1>
+        <p class="mt-2 text-sm leading-6 text-gray-500">登录后可查看订单、购物车与个人资料。</p>
+      </div>
+
+      <form class="mt-7" @submit.prevent="handleLogin">
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-medium text-gray-700">用户名</label>
+          <input
+            v-model="username"
+            type="text"
+            autocomplete="username"
             placeholder="请输入用户名"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            class="w-full border border-gray-300 px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           />
         </div>
-        
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm mb-2">密码</label>
-          <input 
-            v-model="password" 
-            type="password" 
+
+        <div class="mb-6">
+          <label class="mb-2 block text-sm font-medium text-gray-700">密码</label>
+          <input
+            v-model="password"
+            type="password"
+            autocomplete="current-password"
             placeholder="请输入密码"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            class="w-full border border-gray-300 px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           />
         </div>
-        
-        <button 
-          type="submit" 
-          class="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition font-medium"
-        >
+
+        <button type="submit" class="w-full bg-orange-500 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300">
           登录
         </button>
-        
-        <div class="mt-4 text-center">
-          <span class="text-gray-500">还没有账号？</span>
-          <router-link to="/register" class="text-orange-500 ml-2">立即注册</router-link>
-        </div>
+
+        <p class="mt-5 text-center text-sm text-gray-500">
+          还没有账号？
+          <router-link to="/register" class="ml-1 font-medium text-orange-600 hover:text-orange-700">立即注册</router-link>
+        </p>
       </form>
-    </div>
+    </section>
   </div>
 </template>
 

@@ -1,15 +1,20 @@
 <template>
-  <div class="bg-white">
-    <div class="flex">
-      <aside class="w-64 p-4 bg-gray-50">
-        <h3 class="font-bold text-lg mb-4">商品分类</h3>
-        <ul class="space-y-2">
+  <div class="min-h-[560px] bg-white">
+    <div class="flex flex-col lg:flex-row">
+      <aside class="shrink-0 border-b border-gray-200 bg-gray-50 p-5 lg:w-60 lg:border-b-0 lg:border-r">
+        <div class="mb-4 flex items-center justify-between lg:block">
+          <div>
+            <p class="text-xs font-medium text-orange-600">商品导航</p>
+            <h3 class="mt-1 text-lg font-bold text-gray-900">商品分类</h3>
+          </div>
+        </div>
+        <ul class="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible">
           <li
               v-for="category in categoryList"
               :key="category.id"
               :class="[
-              'p-2 rounded cursor-pointer transition',
-              selectedCategory === category.id ? 'bg-orange-500 text-white' : 'hover:bg-gray-200'
+              'shrink-0 cursor-pointer px-3 py-2 text-sm transition lg:block',
+              selectedCategory === category.id ? 'bg-orange-500 font-medium text-white' : 'text-gray-600 hover:bg-white hover:text-orange-600'
             ]"
               @click="selectCategory(category.id)"
           >
@@ -18,48 +23,55 @@
         </ul>
       </aside>
 
-      <main class="flex-1 p-4">
-        <div class="flex justify-between items-center mb-4">
-          <div class="flex items-center space-x-4">
-            <span class="text-gray-600">排序：</span>
+      <main class="min-w-0 flex-1 p-5 sm:p-7">
+        <div class="mb-7 border-b border-gray-200 pb-5">
+          <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p class="text-xs font-medium text-orange-600">商品库</p>
+              <h1 class="mt-1 text-2xl font-bold text-gray-900">{{ searchKeyword ? `“${searchKeyword}” 的搜索结果` : '全部商品' }}</h1>
+            </div>
+            <p class="text-sm text-gray-500">共 <span class="font-semibold text-gray-900">{{ total }}</span> 件商品</p>
+          </div>
+          <div class="mt-5 flex flex-wrap items-center gap-2">
+            <span class="mr-1 text-sm text-gray-500">排序</span>
             <button
                 v-for="sort in sortOptions"
                 :key="sort.value"
                 :class="[
-                'px-3 py-1 rounded transition',
-                currentSort === sort.value ? 'bg-orange-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
+                'border px-3 py-1.5 text-sm transition',
+                currentSort === sort.value ? 'border-orange-500 bg-orange-500 font-medium text-white' : 'border-gray-200 bg-white text-gray-600 hover:border-orange-300 hover:text-orange-600'
               ]"
                 @click="handleSortChange(sort.value)"
             >
               {{ sort.label }}
             </button>
           </div>
-          <div class="flex items-center space-x-2">
-            <span class="text-gray-600">共 {{ total }} 件商品</span>
-          </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           <div
               v-for="product in products"
               :key="product.id"
-              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+              class="group cursor-pointer overflow-hidden border border-gray-200 bg-white transition duration-200 hover:-translate-y-1 hover:border-orange-200 hover:shadow-lg"
               @click="goToDetail(product.id)"
           >
-            <div class="h-48 overflow-hidden">
+            <div class="h-52 overflow-hidden bg-gray-100">
               <img
                   :src="getProductImage(product)"
+                  @error="applyImageFallback"
                   :alt="product.name"
-                  class="w-full h-full object-cover hover:scale-105 transition"
+                  class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
               />
             </div>
             <div class="p-4">
-              <h3 class="text-lg font-semibold text-gray-800 truncate">{{ product.name }}</h3>
-              <p class="text-gray-500 text-sm mt-1">{{ product.subTitle }}</p>
-              <p class="text-orange-500 text-xl font-bold mt-2">¥{{ product.price }}</p>
-              <div class="flex justify-between items-center mt-3">
-                <span class="text-gray-400 text-sm">库存: {{ product.stock }}</span>
-                <button @click.stop="addToCart(product)" class="bg-orange-500 text-white px-4 py-1 rounded hover:bg-orange-600 transition">
+              <h3 class="truncate text-base font-semibold text-gray-900">{{ product.name }}</h3>
+              <p class="mt-1 h-5 truncate text-sm text-gray-500">{{ product.subTitle || '优选好物，品质保障' }}</p>
+              <div class="mt-4 flex items-end justify-between gap-3">
+                <div>
+                  <p class="text-xl font-bold text-orange-600">¥{{ product.price }}</p>
+                  <p class="mt-1 text-xs text-gray-400">库存 {{ product.stock || 0 }}</p>
+                </div>
+                <button @click.stop="addToCart(product)" class="shrink-0 bg-orange-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300">
                   加入购物车
                 </button>
               </div>
@@ -67,7 +79,7 @@
           </div>
         </div>
 
-        <div class="mt-8 flex justify-center">
+        <div class="mt-10 flex justify-center border-t border-gray-100 pt-6">
           <el-pagination
               :current-page="pageNum"
               :page-size="pageSize"
@@ -85,6 +97,7 @@ import { ref, onMounted, watch } from 'vue'
 import { productAPI, cartAPI } from '../api'
 import { useRouter, useRoute } from 'vue-router'
 import { getProductImage } from '../utils/image'
+import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
 
 const router = useRouter()
 const route = useRoute()
@@ -181,5 +194,10 @@ const addToCart = (product) => {
     console.error('加入购物车失败:', err)
     alert('加入购物车失败，请稍后重试')
   })
+}
+
+const applyImageFallback = (event) => {
+  event.target.onerror = null
+  event.target.src = fallbackProductImage
 }
 </script>

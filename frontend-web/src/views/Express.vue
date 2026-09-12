@@ -1,37 +1,40 @@
 <template>
-  <div class="bg-white p-6 max-w-2xl mx-auto">
-    <h2 class="text-xl font-bold mb-6">物流查询</h2>
+  <div class="mx-auto max-w-3xl bg-white p-5 sm:p-8">
+    <div class="mb-7 border-b border-gray-200 pb-5">
+      <p class="text-sm font-medium text-orange-600">配送服务</p>
+      <h1 class="mt-1 text-2xl font-bold text-gray-900">物流查询</h1>
+    </div>
     
-    <div class="border rounded-lg p-4 mb-6">
-      <div class="flex space-x-4">
+    <div class="mb-6 border border-gray-200 bg-gray-50 p-4 sm:p-5">
+      <div class="flex flex-col gap-3 sm:flex-row">
         <input 
           v-model="trackingNo" 
           type="text" 
           placeholder="请输入运单号"
-          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          class="flex-1 border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
         <button 
           @click="searchExpress" 
-          class="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+          class="bg-orange-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-orange-600"
         >
           查询
         </button>
       </div>
     </div>
 
-    <div v-if="expressInfo" class="border rounded-lg p-4">
-      <div class="flex justify-between items-center mb-4">
+    <div v-if="expressInfo" class="border border-gray-200">
+      <div class="flex flex-col gap-2 border-b border-gray-100 bg-gray-50 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p class="font-bold">运单号：{{ expressInfo.trackingNo }}</p>
-          <p class="text-gray-500 text-sm">{{ expressInfo.company }}</p>
+          <p class="font-bold text-gray-900">运单号：{{ expressInfo.trackingNo }}</p>
+          <p class="mt-1 text-sm text-gray-500">{{ expressInfo.company }}</p>
         </div>
         <span :class="getStatusClass(expressInfo.status)">{{ getStatusText(expressInfo.status) }}</span>
       </div>
       
-      <div class="relative pl-6">
+      <div class="relative px-5 py-6 pl-11">
         <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-200"></div>
         
-        <div class="space-y-4">
+        <div class="space-y-6">
           <div 
             v-for="(item, index) in expressInfo.trackingList" 
             :key="index"
@@ -39,30 +42,30 @@
           >
             <div 
               :class="[
-                'absolute -left-4 w-4 h-4 rounded-full border-2 flex items-center justify-center',
+                'absolute -left-4 flex h-4 w-4 items-center justify-center rounded-full border-2',
                 index === 0 ? 'border-orange-500 bg-orange-500' : 'border-gray-300 bg-white'
               ]"
             >
               <div v-if="index === 0" class="w-2 h-2 bg-white rounded-full"></div>
             </div>
             <div class="ml-4">
-              <p>{{ item.description }}</p>
-              <p class="text-gray-400 text-sm">{{ item.time }}</p>
+              <p class="text-sm leading-6 text-gray-800">{{ item.description }}</p>
+              <p class="mt-1 text-sm text-gray-400">{{ item.time }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-else-if="searched" class="text-center py-12">
-      <p class="text-gray-400">未查询到物流信息</p>
+    <div v-else-if="searched" class="py-16 text-center">
+      <p class="text-gray-500">未查询到物流信息</p>
     </div>
 
-    <div v-else class="text-center py-12">
+    <div v-else class="py-16 text-center">
       <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
       </svg>
-      <p class="text-gray-400 mt-4">请输入运单号查询物流信息</p>
+      <p class="mt-4 text-gray-500">请输入运单号查询物流信息</p>
     </div>
   </div>
 </template>

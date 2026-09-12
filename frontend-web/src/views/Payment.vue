@@ -1,39 +1,42 @@
 <template>
-  <div class="bg-white p-6 max-w-2xl mx-auto">
-    <h2 class="text-xl font-bold mb-6">选择支付方式</h2>
+  <div class="mx-auto max-w-3xl bg-white p-5 sm:p-8">
+    <div class="mb-7 border-b border-gray-200 pb-5">
+      <p class="text-sm font-medium text-orange-600">安全结算</p>
+      <h1 class="mt-1 text-2xl font-bold text-gray-900">选择支付方式</h1>
+    </div>
 
-    <div v-if="order" class="border rounded-lg p-4 mb-6">
-      <div class="flex justify-between items-center mb-2">
+    <div v-if="order" class="mb-6 border border-gray-200 bg-gray-50 p-5">
+      <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <span class="text-gray-600">订单号</span>
-        <span>{{ order.orderNo }}</span>
+        <span class="break-all text-sm font-medium text-gray-900">{{ order.orderNo }}</span>
       </div>
-      <div class="flex justify-between items-center">
+      <div class="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
         <span class="text-gray-600">支付金额</span>
-        <span class="text-orange-500 text-xl font-bold">¥{{ order.payAmount }}</span>
+        <span class="text-2xl font-bold text-orange-600">¥{{ order.payAmount }}</span>
       </div>
     </div>
 
-    <div class="space-y-4">
+    <div class="space-y-3">
       <div
           v-for="method in paymentMethods"
           :key="method.id"
           :class="[
-          'border rounded-lg p-4 cursor-pointer transition',
-          selectedMethod === method.id ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300'
+          'cursor-pointer border p-4 transition',
+          selectedMethod === method.id ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-orange-200'
         ]"
           @click="selectedMethod = method.id"
       >
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-4">
           <div class="flex items-center">
-            <div :class="['w-10 h-10 rounded-full flex items-center justify-center text-lg mr-4', method.bgClass]">
+            <div :class="['mr-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg', method.bgClass]">
               {{ method.icon }}
             </div>
             <div>
-              <p class="font-medium">{{ method.name }}</p>
-              <p class="text-gray-500 text-sm">{{ method.description }}</p>
+              <p class="font-medium text-gray-900">{{ method.name }}</p>
+              <p class="mt-1 text-sm text-gray-500">{{ method.description }}</p>
             </div>
           </div>
-          <div :class="['w-5 h-5 rounded-full border-2 flex items-center justify-center', selectedMethod === method.id ? 'border-orange-500' : 'border-gray-300']">
+          <div :class="['flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2', selectedMethod === method.id ? 'border-orange-500' : 'border-gray-300']">
             <div v-if="selectedMethod === method.id" class="w-3 h-3 rounded-full bg-orange-500"></div>
           </div>
         </div>
@@ -44,26 +47,26 @@
       <button
           @click="submitPayment"
           :disabled="isSubmitting"
-          class="w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+          class="w-full bg-orange-500 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-400"
       >
         {{ isSubmitting ? '处理中...' : `立即支付 ¥${order?.payAmount || 0}` }}
       </button>
     </div>
 
-    <div class="mt-4 text-center">
-      <button @click="goBack" class="text-gray-500 hover:text-gray-700">
+    <div class="mt-5 text-center">
+      <button @click="goBack" class="text-sm text-gray-500 transition hover:text-orange-600">
         返回订单列表
       </button>
     </div>
 
     <div v-if="showSuccess" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-8 text-center max-w-sm mx-4">
+      <div class="mx-4 max-w-sm bg-white p-8 text-center shadow-xl">
         <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
           <span class="text-green-500 text-3xl">✓</span>
         </div>
         <h3 class="text-xl font-bold mb-2">支付成功</h3>
         <p class="text-gray-500 mb-6">您的订单已成功支付</p>
-        <button @click="goToOrder" class="px-8 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
+        <button @click="goToOrder" class="bg-orange-500 px-8 py-2.5 text-sm font-medium text-white hover:bg-orange-600">
           查看订单
         </button>
       </div>
