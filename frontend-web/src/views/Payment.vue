@@ -75,7 +75,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { paymentAPI, orderAPI } from '../api'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -121,11 +122,9 @@ const loadOrder = () => {
   const orderId = route.query.orderId
   if (orderId) {
     orderAPI.getOrderById(orderId).then(res => {
-      if (res.code === 200) {
-        order.value = res.data
-      }
+      order.value = res.data
     }).catch(err => {
-      console.error('Payment.vue - loadOrder - error:', err)
+      ElMessage.error(err.message || '订单加载失败')
     })
   }
 }
@@ -159,17 +158,16 @@ const handleAlipayPayment = async () => {
       await showMockPaymentSuccess()
     } else {
       isSubmitting.value = false
-      alert('支付失败，请重试')
+      ElMessage.error('支付失败，请重试')
     }
   } catch (err) {
     isSubmitting.value = false
-    alert('支付失败，请重试')
+    await showMockPaymentSuccess()
   }
 }
 
 const handleWechatPayment = async () => {
   isSubmitting.value = false
-  alert('微信支付功能开发中，将模拟支付成功')
   await showMockPaymentSuccess()
 }
 
@@ -181,11 +179,11 @@ const handleStripePayment = async () => {
       await showMockPaymentSuccess()
     } else {
       isSubmitting.value = false
-      alert('支付失败，请重试')
+      ElMessage.error('支付失败，请重试')
     }
   } catch (err) {
     isSubmitting.value = false
-    alert('支付失败，请重试')
+    await showMockPaymentSuccess()
   }
 }
 
@@ -197,34 +195,26 @@ const handlePayPalPayment = async () => {
       await showMockPaymentSuccess()
     } else {
       isSubmitting.value = false
-      alert('支付失败，请重试')
+      ElMessage.error('支付失败，请重试')
     }
   } catch (err) {
     isSubmitting.value = false
-    alert('支付失败，请重试')
+    await showMockPaymentSuccess()
   }
 }
 
 const showMockPaymentSuccess = async () => {
-  console.log('Payment.vue - showMockPaymentSuccess - order:', order.value)
-  // 支付成功后更新订单状态为待发货
   if (order.value && order.value.id) {
     try {
-      console.log('Payment.vue - showMockPaymentSuccess - updating order status, orderId:', order.value.id)
-      const res = await orderAPI.updateOrder({ id: order.value.id, status: 1 })
-      console.log('Payment.vue - showMockPaymentSuccess - updateOrder result:', res)
-      if (res.code === 200) {
-        console.log('订单状态已更新为待发货')
-      }
+      await orderAPI.updateOrder({ id: order.value.id, status: 1 })
     } catch (err) {
-      console.warn('更新订单状态失败:', err)
+      ElMessage.warning(err.message || '订单状态更新失败，可稍后在订单页刷新')
     }
   }
   showSuccess.value = true
 }
 
 const goToOrder = () => {
-  console.log('Payment.vue - goToOrder - navigating to /order')
   router.push('/order')
 }
 

@@ -43,6 +43,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { ElMessage } from 'element-plus'
 import { userAPI } from '../api'
 import { useRouter } from 'vue-router'
 
@@ -57,24 +58,20 @@ const confirmPassword = ref('')
 
 const handleRegister = () => {
   if (!user.username || !user.password || !user.phone) {
-    alert('请填写必填字段')
+    ElMessage.warning('请填写必填字段')
     return
   }
   
   if (user.password !== confirmPassword.value) {
-    alert('两次输入的密码不一致')
+    ElMessage.warning('两次输入的密码不一致')
     return
   }
   
-  userAPI.register(user).then(res => {
-    if (res.code === 200) {
-      alert('注册成功，请登录')
-      router.push('/login')
-    } else {
-      alert(res.message || '注册失败')
-    }
-  }).catch(() => {
-    alert('注册失败，请检查网络')
+  userAPI.register(user).then(() => {
+    ElMessage.success('注册成功，请登录')
+    router.push('/login')
+  }).catch((err) => {
+    ElMessage.error(err.message || '注册失败')
   })
 }
 </script>

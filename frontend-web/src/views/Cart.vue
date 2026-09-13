@@ -88,10 +88,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { cartAPI, orderAPI } from '../api'
+import { addressAPI, buildReceiverFromAddress, cartAPI, orderAPI } from '../api'
 import { useRouter } from 'vue-router'
-import { getProductImage } from '../utils/image'
-import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
+import { applyImageFallback, getProductImage } from '../utils/image'
 
 const router = useRouter()
 const cartList = ref([])
@@ -157,49 +156,50 @@ const deleteCartItem = (cartId) => {
     })
 }
 
-const applyImageFallback = (event) => {
-  event.target.onerror = null
-  event.target.src = fallbackProductImage
+const checkout = async () => {
+  if (cartList.value.length === 0) {
+    ElMessage.warning('购物车是空的')
+    return
+  }
+
+  isSubmitting.value = true
+  try {
+    const addressRes = await addressAPI.list()
+    const addresses = addressRes.data || []
+    const address = addresses.find((item) => Number(item.isDefault) === 1) || addresses[0]
+    if (!address) {
+      ElMessage.warning('请先在个人中心添加收货地址')
+      router.push('/user')
+      return
+    }
+
+    const orderItems = cartList.value.map((item) => ({
+      productId: item.productId,
+      productName: item.productName,
+      productImage: item.productImage || item.mainImage || item.image,
+      price: item.price,
+      quantity: item.quantity,
+      skuId: item.skuId || 1,
+      specs: item.specs || '默认规格'
+    }))
+
+    const res = await orderAPI.createOrder({
+      items: orderItems,
+      totalAmount: totalAmount.value,
+      payAmount: totalAmount.value,
+      freightAmount: 0,
+      discountAmount: 0,
+      ...buildReceiverFromAddress(address)
+    })
+
+    await cartAPI.clearCart()
+    router.push(`/payment?orderId=${res.data.id}`)
+  } catch (err) {
+    ElMessage.error(err.message || '创建订单失败')
+  } finally {
+    isSubmitting.value = false
+  }
 }
-const checkout = () => {
- if (cartList.value.length === 0) {
- alert('购物车是空的');
- return;
- }
- isSubmitting.value = true;
- const orderItems = cartList.value.map(item => ({
- productId: item.productId,
- productName: item.productName,
- price: item.price,
- quantity: item.quantity,
- skuId: item.skuId || 1,
- specs: item.specs || '默认规格'
- }));
- const order = {
- items: orderItems,
- totalAmount: totalAmount.value,
- payAmount: totalAmount.value,
- freightAmount: 0,
- discountAmount: 0,
- receiverName: '张三',
- receiverPhone: '13800138000',
- receiverAddress: '北京市朝阳区测试地址123号'
- };
- orderAPI.createOrder(order).then(res => {
-    if (res.code === 200) {
-      cartAPI.clearCart().then(() => {
-        router.push(`/payment?orderId=${res.data.id}`);
-      });
-    }
-    else {
-      alert(res.message || '创建订单失败');
-    }
-  }).catch(err => {
-    console.error('创建订单失败:', err);
-  }).finally(() => {
-    isSubmitting.value = false;
-  });
-};
 onMounted(() => {
  loadCart();
 });

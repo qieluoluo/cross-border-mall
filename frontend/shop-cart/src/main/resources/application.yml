@@ -13,6 +13,7 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
+        fail-fast: false
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true

@@ -39,11 +39,11 @@ CREATE TABLE `user` (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', 'zhangwei', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iOn6r.EuaVvVOzM8QvYKq5oqW2J2', '13800138001', 'zhangwei@example.com', null, '小明同学', '1', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
-INSERT INTO `user` VALUES ('2', 'lina', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iOn6r.EuaVvVOzM8QvYKq5oqW2J2', '13800138002', 'lina@example.com', null, '丽娜', '2', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
-INSERT INTO `user` VALUES ('3', 'wangqiang', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iOn6r.EuaVvVOzM8QvYKq5oqW2J2', '13800138003', 'wangqiang@example.com', null, '阿强', '1', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
-INSERT INTO `user` VALUES ('4', 'zhaomei', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iOn6r.EuaVvVOzM8QvYKq5oqW2J2', '13800138004', 'zhaomei@example.com', null, '小美', '2', '0', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
-INSERT INTO `user` VALUES ('5', 'chenlong', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iOn6r.EuaVvVOzM8QvYKq5oqW2J2', '13800138005', 'chenlong@example.com', null, '龙哥', '1', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
+INSERT INTO `user` VALUES ('1', 'zhangwei', '123456', '13800138001', 'zhangwei@example.com', null, '小明同学', '1', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
+INSERT INTO `user` VALUES ('2', 'lina', '123456', '13800138002', 'lina@example.com', null, '丽娜', '2', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
+INSERT INTO `user` VALUES ('3', 'wangqiang', '123456', '13800138003', 'wangqiang@example.com', null, '阿强', '1', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
+INSERT INTO `user` VALUES ('4', 'zhaomei', '123456', '13800138004', 'zhaomei@example.com', null, '小美', '2', '0', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
+INSERT INTO `user` VALUES ('5', 'chenlong', '123456', '13800138005', 'chenlong@example.com', null, '龙哥', '1', '1', '2026-04-09 11:44:58', '2026-04-09 11:44:58');
 
 -- ----------------------------
 -- Table structure for `user_address`

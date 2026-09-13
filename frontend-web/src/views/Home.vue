@@ -1,16 +1,17 @@
 <template>
   <div class="space-y-12 pb-12">
     <section class="overflow-hidden bg-white shadow-sm ring-1 ring-gray-100">
-      <el-carousel :interval="4000" height="420px" class="home-carousel">
-        <el-carousel-item v-for="(item, index) in carouselItems" :key="item.id">
+      <el-carousel :interval="5000" height="420px" class="home-carousel">
+        <el-carousel-item v-for="item in carouselItems" :key="item.id">
           <div class="relative h-full">
-            <img :src="item.image" :alt="item.title" class="h-full w-full object-cover" />
-            <div class="absolute inset-x-0 bottom-0 bg-black/55 px-6 py-6 text-white sm:px-10 sm:py-8">
-              <p class="text-sm font-medium text-orange-200">精选好物</p>
-              <h1 class="mt-1 text-2xl font-bold sm:text-3xl">{{ item.title }}</h1>
-              <p class="mt-2 max-w-xl text-sm text-gray-200">发现日常所需的高品质商品，精选推荐持续更新。</p>
-              <button @click="goToProducts(index + 1)" class="mt-4 border border-white px-4 py-2 text-sm font-medium transition hover:bg-white hover:text-gray-900">
-                立即选购
+            <img :src="item.image" :alt="item.title" class="h-full w-full object-cover object-center" />
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"></div>
+            <div class="absolute inset-y-0 left-0 flex w-full max-w-xl flex-col justify-center px-6 text-white sm:px-12">
+              <p class="text-sm font-medium tracking-wide text-orange-200">{{ item.eyebrow }}</p>
+              <h1 class="mt-2 text-3xl font-bold leading-tight sm:text-4xl">{{ item.title }}</h1>
+              <p class="mt-3 max-w-md text-sm leading-6 text-gray-100 sm:text-base">{{ item.desc }}</p>
+              <button @click="goToProducts(item.categoryId)" class="mt-6 w-fit bg-orange-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-orange-600">
+                {{ item.button }}
               </button>
             </div>
           </div>
@@ -97,21 +98,42 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { productAPI, cartAPI } from '../api'
 import { useRouter } from 'vue-router'
-import { getProductImage } from '../utils/image'
-import carouselPhoneImage from '../../../miniapp/小程序项目/images/iphone.png'
-import carouselDressImage from '../../../miniapp/小程序项目/images/qunzi.png'
-import carouselApplianceImage from '../../../miniapp/小程序项目/images/haier.png'
-import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
+import { applyImageFallback, getProductImage } from '../utils/image'
 
 const router = useRouter()
 const products = ref([])
 
 const carouselItems = [
-  { id: 1, image: carouselPhoneImage, title: '数码产品' },
-  { id: 2, image: carouselDressImage, title: '时尚服饰' },
-  { id: 3, image: carouselApplianceImage, title: '家用电器' }
+  {
+    id: 1,
+    image: '/images/banner-digital.jpg',
+    eyebrow: '数码精选',
+    title: '把好用的数码带回家',
+    desc: '手机、电脑和配件集中挑选，适合日常升级和换新。',
+    button: '逛数码馆',
+    categoryId: 1
+  },
+  {
+    id: 2,
+    image: '/images/banner-fashion.jpg',
+    eyebrow: '当季穿搭',
+    title: '轻松选一件顺眼的衣服',
+    desc: '男装女装都在这一区，按日常穿搭慢慢挑就行。',
+    button: '看服饰',
+    categoryId: 3
+  },
+  {
+    id: 3,
+    image: '/images/banner-home.jpg',
+    eyebrow: '家居焕新',
+    title: '厨房和客厅也能更舒服',
+    desc: '冰箱、空调等家电按家里的使用场景来看，更好选。',
+    button: '看家电',
+    categoryId: 2
+  }
 ]
 
 const categories = [
@@ -125,8 +147,10 @@ const categories = [
 const loadProducts = () => {
   productAPI.getProductList(1, 8).then(res => {
     if (res.code === 200) {
-      products.value = res.data.records
+      products.value = res.data.records || []
     }
+  }).catch((err) => {
+    ElMessage.error(err.message || '商品加载失败，请确认商品服务已启动')
   })
 }
 
@@ -143,19 +167,11 @@ const addToCart = (product) => {
     router.push('/login')
     return
   }
-  cartAPI.addToCart(product.id, 1).then(res => {
-    if (res.code === 200) {
-      alert('加入购物车成功')
-    }
+  cartAPI.addToCart(product.id, 1).then(() => {
+    ElMessage.success('已加入购物车')
   }).catch(err => {
-    console.error('加入购物车失败:', err)
-    alert('加入购物车失败，请稍后重试')
+    ElMessage.error(err.message || '加入购物车失败')
   })
-}
-
-const applyImageFallback = (event) => {
-  event.target.onerror = null
-  event.target.src = fallbackProductImage
 }
 
 onMounted(() => {

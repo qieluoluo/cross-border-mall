@@ -3,7 +3,9 @@ package com.delmon.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.delmon.entity.Order;
+import com.delmon.entity.OrderItem;
 import com.delmon.enums.ResultCode;
+import com.delmon.mapper.OrderItemMapper;
 import com.delmon.mapper.OrderMapper;
 import com.delmon.result.Result;
 import com.delmon.service.OrderService;
@@ -27,12 +29,14 @@ import java.util.Map;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderMapper orderMapper;
+    private final OrderItemMapper orderItemMapper;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${express.service.url:http://localhost:8083}")
     private String expressServiceUrl;
 
     @Override
+    @Transactional
     public Result<Long> create(Map<String, Object> params) {
         // 简化版：直接创建订单
         Long userId = Long.valueOf(params.get("userId").toString());
@@ -57,28 +61,57 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(0); // 待付款
         order.setPayType(2); // 默认支付方式：支付宝
 
-        // 收货地址信息（如果有）
-        if (params.containsKey("addressId")) {
+        if (params.containsKey("addressId") && params.get("addressId") != null) {
             order.setAddressId(Long.valueOf(params.get("addressId").toString()));
+        } else {
+            order.setAddressId(0L);
         }
-        if (params.containsKey("receiverName")) {
+        if (params.containsKey("receiverName") && params.get("receiverName") != null) {
             order.setReceiverName(params.get("receiverName").toString());
         }
-        if (params.containsKey("receiverPhone")) {
+        if (params.containsKey("receiverPhone") && params.get("receiverPhone") != null) {
             order.setReceiverPhone(params.get("receiverPhone").toString());
         }
-        if (params.containsKey("receiverAddress")) {
+        if (params.containsKey("receiverAddress") && params.get("receiverAddress") != null) {
             order.setReceiverAddress(params.get("receiverAddress").toString());
         }
-        if (params.containsKey("remark")) {
+        if (params.containsKey("remark") && params.get("remark") != null) {
             order.setRemark(params.get("remark").toString());
         }
 
         orderMapper.insert(order);
-
-        // TODO: 保存订单项、扣减库存、清空购物车
-
+        saveOrderItems(order, items);
         return Result.success(order.getId());
+    }
+
+    private void saveOrderItems(Order order, List<Map<String, Object>> items) {
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+        for (Map<String, Object> item : items) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrderId(order.getId());
+            orderItem.setOrderNo(order.getOrderNo());
+            orderItem.setProductId(item.get("productId") == null ? 0L : Long.valueOf(item.get("productId").toString()));
+            orderItem.setSkuId(item.get("skuId") == null ? 1L : Long.valueOf(item.get("skuId").toString()));
+            orderItem.setProductName(item.get("productName") == null ? "商品" : item.get("productName").toString());
+            Object image = item.get("productImage") != null ? item.get("productImage") : item.get("image");
+            orderItem.setProductImage(image == null ? "" : image.toString());
+            orderItem.setSpecs(item.get("specs") == null ? "默认规格" : item.get("specs").toString());
+            BigDecimal price = new BigDecimal(item.get("price").toString());
+            Integer quantity = Integer.valueOf(item.get("quantity").toString());
+            orderItem.setPrice(price);
+            orderItem.setQuantity(quantity);
+            orderItem.setTotalAmount(price.multiply(new BigDecimal(quantity)));
+            orderItem.setCreateTime(LocalDateTime.now());
+            orderItemMapper.insert(orderItem);
+        }
+    }
+
+    private List<OrderItem> listOrderItems(Long orderId) {
+        return orderItemMapper.selectList(
+            new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, orderId)
+        );
     }
 
     @Override
@@ -87,7 +120,9 @@ public class OrderServiceImpl implements OrderService {
         if (order == null) {
             return Result.error(ResultCode.DATA_NOT_EXIST, "订单不存在");
         }
-        return Result.success(order);
+        Map<String, Object> detail = toOrderMap(order);
+        detail.put("items", listOrderItems(id));
+        return Result.success(detail);
     }
 
     @Override
@@ -112,34 +147,40 @@ public class OrderServiceImpl implements OrderService {
         resultPage.setTotal(orderPage.getTotal());
         resultPage.setRecords(orderPage.getRecords().stream()
             .map(order -> {
-                java.util.Map<String, Object> map = new java.util.HashMap<>();
-                map.put("id", order.getId());
-                map.put("userId", order.getUserId());
-                map.put("orderNo", order.getOrderNo());
-                String userNickname = order.getUserNickname();
-                if (userNickname == null || userNickname.isBlank()) {
-                    userNickname = orderMapper.selectUserNameByUserId(order.getUserId());
-                }
-                map.put("userNickname", (userNickname == null || userNickname.isBlank()) ? "-" : userNickname);
-                map.put("totalAmount", order.getTotalAmount());
-                map.put("payAmount", order.getPayAmount());
-                map.put("freightAmount", order.getFreightAmount());
-                map.put("discountAmount", order.getDiscountAmount());
-                map.put("status", order.getStatus()); // 返回数字状态码，由前端转换为文字
-                map.put("payType", order.getPayType());
-                map.put("receiverName", order.getReceiverName());
-                map.put("receiverPhone", order.getReceiverPhone());
-                map.put("receiverAddress", order.getReceiverAddress());
-                map.put("remark", order.getRemark());
-                map.put("createTime", order.getCreateTime());
-                map.put("payTime", order.getPayTime());
-                map.put("deliveryTime", order.getDeliveryTime());
-                map.put("receiveTime", order.getReceiveTime());
+                Map<String, Object> map = toOrderMap(order);
+                map.put("items", listOrderItems(order.getId()));
                 return (Object) map;
             })
             .collect(java.util.stream.Collectors.toList()));
         
         return Result.success(resultPage);
+    }
+
+    private Map<String, Object> toOrderMap(Order order) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", order.getId());
+        map.put("userId", order.getUserId());
+        map.put("orderNo", order.getOrderNo());
+        String userNickname = order.getUserNickname();
+        if (userNickname == null || userNickname.isBlank()) {
+            userNickname = orderMapper.selectUserNameByUserId(order.getUserId());
+        }
+        map.put("userNickname", (userNickname == null || userNickname.isBlank()) ? "-" : userNickname);
+        map.put("totalAmount", order.getTotalAmount());
+        map.put("payAmount", order.getPayAmount());
+        map.put("freightAmount", order.getFreightAmount());
+        map.put("discountAmount", order.getDiscountAmount());
+        map.put("status", order.getStatus());
+        map.put("payType", order.getPayType());
+        map.put("receiverName", order.getReceiverName());
+        map.put("receiverPhone", order.getReceiverPhone());
+        map.put("receiverAddress", order.getReceiverAddress());
+        map.put("remark", order.getRemark());
+        map.put("createTime", order.getCreateTime());
+        map.put("payTime", order.getPayTime());
+        map.put("deliveryTime", order.getDeliveryTime());
+        map.put("receiveTime", order.getReceiveTime());
+        return map;
     }
 
     @Override

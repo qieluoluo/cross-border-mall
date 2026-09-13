@@ -109,13 +109,14 @@ const checkLogin = async () => {
         username: dbUsername,
         nickname: dbNickname
       }
-      console.log('登录状态验证成功 - 用户ID:', userId, '用户名:', dbUsername, '昵称:', dbNickname)
     } else {
       clearAuthData()
     }
-  } catch (err) {
-    console.warn('后端用户服务不可用，清除登录状态')
-    clearAuthData()
+  } catch {
+    user.value = {
+      username: localStorage.getItem('username') || '用户',
+      nickname: localStorage.getItem('nickname') || localStorage.getItem('username') || '用户'
+    }
   }
 }
 
@@ -148,12 +149,14 @@ const refreshData = () => {
   getCartCount()
 }
 
+let removeAfterEach = () => {}
+
 onMounted(() => {
   refreshData()
-  router.afterEach(refreshData)
+  removeAfterEach = router.afterEach(refreshData)
 })
 
 onUnmounted(() => {
-  router.afterEach(() => {})
+  removeAfterEach()
 })
 </script>

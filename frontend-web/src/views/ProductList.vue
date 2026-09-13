@@ -94,10 +94,10 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { productAPI, cartAPI } from '../api'
 import { useRouter, useRoute } from 'vue-router'
-import { getProductImage } from '../utils/image'
-import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
+import { applyImageFallback, getProductImage } from '../utils/image'
 
 const router = useRouter()
 const route = useRoute()
@@ -109,14 +109,9 @@ const selectedCategory = ref(0)
 const currentSort = ref('default')
 const searchKeyword = ref('')
 
-const categoryList = [
-  { id: 0, name: '全部商品' },
-  { id: 1, name: '手机数码' },
-  { id: 2, name: '家用电器' },
-  { id: 3, name: '服装鞋帽' },
-  { id: 4, name: '美妆个护' },
-  { id: 5, name: '图书文娱' }
-]
+const categoryList = ref([
+  { id: 0, name: '全部商品' }
+])
 
 const sortOptions = [
   { label: '默认', value: 'default' },
@@ -125,45 +120,70 @@ const sortOptions = [
   { label: '销量优先', value: 'sales' }
 ]
 
-const loadProducts = () => {
-  if (searchKeyword.value) {
-    productAPI.searchProducts(searchKeyword.value, pageNum.value, pageSize.value).then(res => {
-      if (res.code === 200) {
-        products.value = res.data.records || res.data
-        total.value = res.data.total || products.value.length
-      }
-    })
-  } else {
-    productAPI.getProductList(pageNum.value, pageSize.value, selectedCategory.value, currentSort.value).then(res => {
-      if (res.code === 200) {
-        products.value = res.data.records
-        total.value = res.data.total
-      }
-    })
+const syncQuery = () => {
+  const keyword = route.query.keyword
+  searchKeyword.value = keyword ? decodeURIComponent(String(keyword)) : ''
+  const category = Number(route.query.category)
+  selectedCategory.value = Number.isNaN(category) ? 0 : category
+}
+
+const loadCategories = async () => {
+  try {
+    const res = await productAPI.getCategories()
+    const all = res.data || []
+    const topLevel = all
+      .filter((item) => Number(item.parentId ?? item.parent_id ?? 0) === 0)
+      .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
+    categoryList.value = [{ id: 0, name: '全部商品' }, ...topLevel]
+  } catch {
+    categoryList.value = [
+      { id: 0, name: '全部商品' },
+      { id: 1, name: '手机数码' },
+      { id: 2, name: '家用电器' },
+      { id: 3, name: '服装鞋帽' },
+      { id: 4, name: '美妆个护' },
+      { id: 5, name: '图书文娱' }
+    ]
   }
 }
 
-onMounted(() => {
-  const keyword = route.query.keyword
-  if (keyword) {
-    searchKeyword.value = decodeURIComponent(keyword)
-  }
+const loadProducts = () => {
+  const request = searchKeyword.value
+    ? productAPI.searchProducts(searchKeyword.value, pageNum.value, pageSize.value)
+    : productAPI.getProductList(pageNum.value, pageSize.value, selectedCategory.value, currentSort.value)
+
+  request.then((res) => {
+    products.value = res.data?.records || []
+    total.value = res.data?.total || products.value.length
+  }).catch((err) => {
+    ElMessage.error(err.message || '商品加载失败')
+    products.value = []
+    total.value = 0
+  })
+}
+
+onMounted(async () => {
+  syncQuery()
+  await loadCategories()
   loadProducts()
 })
 
-watch(() => route.query.keyword, (newKeyword) => {
-  if (newKeyword) {
-    searchKeyword.value = decodeURIComponent(newKeyword)
-    pageNum.value = 1
-    selectedCategory.value = 0
-    loadProducts()
-  }
+watch(() => [route.query.keyword, route.query.category], () => {
+  pageNum.value = 1
+  syncQuery()
+  loadProducts()
 })
 
 const selectCategory = (id) => {
   selectedCategory.value = id
   pageNum.value = 1
-  loadProducts()
+  const query = { ...route.query }
+  if (id) {
+    query.category = String(id)
+  } else {
+    delete query.category
+  }
+  router.replace({ path: '/products', query })
 }
 
 const handleSortChange = (sortValue) => {
@@ -186,18 +206,10 @@ const addToCart = (product) => {
     router.push('/login')
     return
   }
-  cartAPI.addToCart(product.id, 1).then(res => {
-    if (res.code === 200) {
-      alert('加入购物车成功')
-    }
+  cartAPI.addToCart(product.id, 1).then(() => {
+    ElMessage.success('已加入购物车')
   }).catch(err => {
-    console.error('加入购物车失败:', err)
-    alert('加入购物车失败，请稍后重试')
+    ElMessage.error(err.message || '加入购物车失败')
   })
-}
-
-const applyImageFallback = (event) => {
-  event.target.onerror = null
-  event.target.src = fallbackProductImage
 }
 </script>

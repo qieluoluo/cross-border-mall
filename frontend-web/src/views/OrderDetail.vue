@@ -101,10 +101,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { orderAPI } from '../api'
 import { useRoute, useRouter } from 'vue-router'
-import { getProductImage } from '../utils/image'
-import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
+import { applyImageFallback, getProductImage } from '../utils/image'
 
 const route = useRoute()
 const router = useRouter()
@@ -139,9 +139,9 @@ const getStatusClass = (status) => {
 const loadOrder = () => {
   const id = route.params.id
   orderAPI.getOrderById(id).then(res => {
-    if (res.code === 200) {
-      order.value = res.data
-    }
+    order.value = res.data
+  }).catch((err) => {
+    ElMessage.error(err.message || '订单加载失败')
   })
 }
 
@@ -171,11 +171,6 @@ const confirmOrder = (orderId) => {
 
 const goBack = () => {
   router.push('/order')
-}
-
-const applyImageFallback = (event) => {
-  event.target.onerror = null
-  event.target.src = fallbackProductImage
 }
 
 onMounted(() => {

@@ -38,6 +38,7 @@ CREATE TABLE `admin` (
 -- ----------------------------
 INSERT INTO `admin` VALUES ('1', '超级管理员', '123456', '张三', '1', '1', null, null, null);
 INSERT INTO `admin` VALUES ('2', '商家', '123456', '李四', '2', '1', '10.177.13.239', '2026-04-03 19:15:31', '2026-03-31 15:23:13');
+INSERT INTO `admin` VALUES ('3', 'admin', 'admin123', '系统管理员', '1', '1', null, null, null);
 
 -- ----------------------------
 -- Table structure for `admin_log`

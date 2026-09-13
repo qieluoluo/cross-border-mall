@@ -119,7 +119,7 @@
             </div>
             
             <button 
-              @click="showAddAddress = true" 
+              @click="resetAddressForm(); showAddAddress = true" 
               class="w-full border-2 border-dashed border-gray-300 p-4 text-sm text-gray-500 transition hover:border-orange-500 hover:text-orange-500"
             >
               + 添加收货地址
@@ -129,7 +129,7 @@
       </div>
     </div>
     
-    <el-dialog v-model="showAddAddress" title="添加收货地址" width="min(92vw, 640px)">
+    <el-dialog v-model="showAddAddress" :title="addressForm.id ? '编辑收货地址' : '添加收货地址'" width="min(92vw, 640px)">
       <form @submit.prevent="addAddress">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
@@ -198,7 +198,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { userAPI } from '../api'
+import { addressAPI, getCurrentUserId, userAPI } from '../api'
 import { ElMessage } from 'element-plus'
 
 const userInfo = ref(null)
@@ -212,6 +212,7 @@ const updateForm = reactive({
 })
 
 const addressForm = reactive({
+  id: null,
   receiverName: '',
   receiverPhone: '',
   province: '',
@@ -220,6 +221,17 @@ const addressForm = reactive({
   detailAddress: '',
   isDefault: false
 })
+
+const resetAddressForm = () => {
+  addressForm.id = null
+  addressForm.receiverName = ''
+  addressForm.receiverPhone = ''
+  addressForm.province = ''
+  addressForm.city = ''
+  addressForm.district = ''
+  addressForm.detailAddress = ''
+  addressForm.isDefault = false
+}
 
 const loadUserInfo = () => {
   const userId = localStorage.getItem('userId')
@@ -258,26 +270,83 @@ const handleUpdate = () => {
   })
 }
 
+const loadAddresses = () => {
+  const userId = getCurrentUserId()
+  if (!userId) return
+  addressAPI.list(userId).then((res) => {
+    addresses.value = res.data || []
+  }).catch((err) => {
+    ElMessage.error(err.message || '地址加载失败')
+  })
+}
+
 const addAddress = () => {
-  alert('地址添加功能开发中...')
-  showAddAddress.value = false
+  const userId = getCurrentUserId()
+  if (!userId) {
+    ElMessage.warning('请先登录')
+    return
+  }
+  if (!addressForm.receiverName || !addressForm.receiverPhone || !addressForm.detailAddress) {
+    ElMessage.warning('请填写收货人、手机号和详细地址')
+    return
+  }
+
+  const payload = {
+    id: addressForm.id || undefined,
+    userId,
+    receiverName: addressForm.receiverName,
+    receiverPhone: addressForm.receiverPhone,
+    province: addressForm.province,
+    city: addressForm.city,
+    district: addressForm.district,
+    detailAddress: addressForm.detailAddress,
+    isDefault: addressForm.isDefault ? 1 : 0
+  }
+
+  const request = addressForm.id ? addressAPI.update(payload) : addressAPI.add(payload)
+  request.then(() => {
+    ElMessage.success(addressForm.id ? '地址已更新' : '地址已添加')
+    showAddAddress.value = false
+    resetAddressForm()
+    loadAddresses()
+  }).catch((err) => {
+    ElMessage.error(err.message || '保存地址失败')
+  })
 }
 
 const setDefault = (addressId) => {
-  alert('设置默认地址功能开发中...')
+  addressAPI.setDefault(addressId).then(() => {
+    ElMessage.success('已设为默认地址')
+    loadAddresses()
+  }).catch((err) => {
+    ElMessage.error(err.message || '设置失败')
+  })
 }
 
 const editAddress = (address) => {
-  alert('编辑地址功能开发中...')
+  addressForm.id = address.id
+  addressForm.receiverName = address.receiverName
+  addressForm.receiverPhone = address.receiverPhone
+  addressForm.province = address.province
+  addressForm.city = address.city
+  addressForm.district = address.district
+  addressForm.detailAddress = address.detailAddress
+  addressForm.isDefault = Number(address.isDefault) === 1
+  showAddAddress.value = true
 }
 
 const deleteAddress = (addressId) => {
-  if (confirm('确定删除该地址？')) {
-    alert('删除地址功能开发中...')
-  }
+  if (!confirm('确定删除该地址？')) return
+  addressAPI.remove(addressId).then(() => {
+    ElMessage.success('地址已删除')
+    loadAddresses()
+  }).catch((err) => {
+    ElMessage.error(err.message || '删除失败')
+  })
 }
 
 onMounted(() => {
   loadUserInfo()
+  loadAddresses()
 })
 </script>

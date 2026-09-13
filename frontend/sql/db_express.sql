@@ -13,6 +13,7 @@ File Encoding         : 65001
 Date: 2026-05-07 12:00:00
 */
 CREATE DATABASE IF NOT EXISTS db_express DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE db_express;
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------

@@ -32,7 +32,8 @@
         </div>
 
         <div class="divide-y divide-gray-100 px-4">
-          <div v-for="item in order.items" :key="item.id" class="flex items-center gap-3 py-4 sm:gap-4">
+          <div v-if="!order.items || order.items.length === 0" class="px-4 py-6 text-sm text-gray-400">暂无商品明细</div>
+          <div v-for="item in (order.items || [])" :key="item.id || item.productId" class="flex items-center gap-3 py-4 sm:gap-4">
             <img
                 :src="getProductImage(item)"
                 @error="applyImageFallback"
@@ -89,10 +90,10 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { orderAPI } from '../api'
 import { useRouter } from 'vue-router'
-import { getProductImage } from '../utils/image'
-import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
+import { applyImageFallback, getProductImage } from '../utils/image'
 
 const router = useRouter()
 const orderList = ref([])
@@ -137,15 +138,11 @@ const loadOrders = () => {
     router.push('/login')
     return
   }
-  console.log('Order.vue - loadOrders - activeTab:', activeTab.value)
   orderAPI.getOrderList(activeTab.value).then(res => {
-    console.log('Order.vue - loadOrders - getOrderList result:', res)
-    if (res.code === 200) {
-      orderList.value = res.data
-      console.log('Order.vue - loadOrders - orderList:', orderList.value)
-    }
+    orderList.value = res.data || []
   }).catch(err => {
-    console.error('Order.vue - loadOrders - error:', err)
+    ElMessage.error(err.message || '订单加载失败')
+    orderList.value = []
   })
 }
 
@@ -175,11 +172,6 @@ const confirmOrder = (orderId) => {
 
 const goToDetail = (orderId) => {
   router.push(`/order/${orderId}`)
-}
-
-const applyImageFallback = (event) => {
-  event.target.onerror = null
-  event.target.src = fallbackProductImage
 }
 
 onMounted(() => {

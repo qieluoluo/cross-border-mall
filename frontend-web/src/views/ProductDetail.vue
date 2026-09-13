@@ -77,11 +77,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { productAPI, cartAPI } from '../api'
 import { useRoute, useRouter } from 'vue-router'
-import { getProductImage } from '../utils/image'
-import fallbackProductImage from '../../../miniapp/小程序项目/images/xiaomi14.png'
+import { applyImageFallback, getProductImage } from '../utils/image'
 
 const route = useRoute()
 const router = useRouter()
@@ -100,21 +100,12 @@ const loadProduct = () => {
   
   const id = route.params.id
   productAPI.getProductById(id).then(res => {
-    if (res.code === 200 && res.data) {
-      product.value = res.data
-      productNotFound.value = false
-    } else if (res.code === 404) {
-      product.value = null
-      productNotFound.value = true
-    } else {
-      product.value = null
-      productNotFound.value = false
-    }
+    product.value = res.data
+    productNotFound.value = !res.data
     loading.value = false
-  }).catch(err => {
-    console.error('加载商品失败:', err)
+  }).catch(() => {
     product.value = null
-    productNotFound.value = false
+    productNotFound.value = true
     loading.value = false
   })
 }
@@ -124,13 +115,10 @@ const addToCart = () => {
     router.push('/login')
     return
   }
-  cartAPI.addToCart(product.value.id, quantity.value).then(res => {
-    if (res.code === 200) {
-      alert('加入购物车成功')
-    }
+  cartAPI.addToCart(product.value.id, quantity.value).then(() => {
+    ElMessage.success('已加入购物车')
   }).catch(err => {
-    console.error('加入购物车失败:', err)
-    alert('加入购物车失败，请稍后重试')
+    ElMessage.error(err.message || '加入购物车失败')
   })
 }
 
@@ -139,23 +127,19 @@ const buyNow = () => {
     router.push('/login')
     return
   }
-  cartAPI.addToCart(product.value.id, quantity.value).then(res => {
-    if (res.code === 200) {
-      router.push('/cart')
-    } else {
-      alert('添加商品失败')
-    }
-  }).catch(() => {
-    alert('添加商品失败')
+  cartAPI.addToCart(product.value.id, quantity.value).then(() => {
+    router.push('/cart')
+  }).catch((err) => {
+    ElMessage.error(err.message || '添加商品失败')
   })
 }
 
-const applyImageFallback = (event) => {
-  event.target.onerror = null
-  event.target.src = fallbackProductImage
-}
-
 onMounted(() => {
+  loadProduct()
+})
+
+watch(() => route.params.id, () => {
+  quantity.value = 1
   loadProduct()
 })
 </script>
