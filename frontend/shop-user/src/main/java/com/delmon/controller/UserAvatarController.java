@@ -19,7 +19,23 @@ public class UserAvatarController {
     @Autowired
     private UserMapper userMapper;
 
-    private static final String AVATAR_DIR = "F:/study_project/springcloud/Bundaberg/projects/bundbaberg/bundaberg/static/images/avatars/";
+    private static String resolveAvatarDir() {
+        String userDir = System.getProperty("user.dir");
+        String[] candidates = {
+                "F:/大三课内/小学期/github/frontend-web/public/images/avatars/",
+                userDir + "/frontend-web/public/images/avatars/",
+                "F:/大三课内/小学期/github/miniapp/小程序项目/images/avatars/",
+                "F:/study_project/springcloud/Bundaberg/projects/bundbaberg/bundaberg/static/images/avatars/"
+        };
+        for (String candidate : candidates) {
+            File dir = new File(candidate);
+            if (dir.exists() || dir.mkdirs()) {
+                String absolute = dir.getAbsolutePath().replace("\\", "/");
+                return absolute.endsWith("/") ? absolute : absolute + "/";
+            }
+        }
+        return candidates[0];
+    }
 
     @PostMapping("/avatar/upload")
     public Map<String, Object> uploadAvatar(@RequestParam("file") MultipartFile file, 
@@ -33,7 +49,8 @@ public class UserAvatarController {
         }
 
         try {
-            File dir = new File(AVATAR_DIR);
+            String avatarDir = resolveAvatarDir();
+            File dir = new File(avatarDir);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
@@ -43,7 +60,7 @@ public class UserAvatarController {
                 ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
                 : ".jpg";
             String newFilename = UUID.randomUUID().toString() + extension;
-            String filePath = AVATAR_DIR + newFilename;
+            String filePath = avatarDir + newFilename;
 
             file.transferTo(new File(filePath));
 

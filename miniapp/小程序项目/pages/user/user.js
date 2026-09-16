@@ -1,4 +1,5 @@
-// pages/user/user.js
+const { resolveImage, DEFAULT_IMAGE } = require('../../utils/config')
+
 Page({
   data: {
     userInfo: {
@@ -27,10 +28,7 @@ Page({
         console.log('用户信息返回:', res.data)
         if (res.data.code === 200) {
           const user = res.data.data
-          let avatarUrl = user.avatar || '/images/yonghu.jpg'
-          if (!avatarUrl.startsWith('http')) {
-            avatarUrl = 'http://localhost:8888' + avatarUrl
-          }
+          let avatarUrl = resolveImage(user.avatar || '/images/yonghu.jpg')
           const userInfo = {
             nickName: user.nickname || user.username || '用户',
             avatarUrl: avatarUrl
@@ -46,6 +44,12 @@ Page({
         console.error('请求失败:', err)
         this.useLocalCache()
       }
+    })
+  },
+
+  onImageError() {
+    this.setData({
+      'userInfo.avatarUrl': DEFAULT_IMAGE
     })
   },
 

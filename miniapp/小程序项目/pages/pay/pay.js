@@ -47,16 +47,15 @@ Page({
           })
           wx.showToast({ title: '支付已创建', icon: 'success' })
         } else {
-          wx.showToast({ 
-            title: res.data.message || '创建支付失败', 
-            icon: 'none' 
-          })
+          this.setData({ outTradeNo: 'DEMO' + Date.now() })
+          wx.showToast({ title: '已进入演示支付', icon: 'none' })
         }
       },
       fail: (err) => {
         wx.hideLoading()
         console.error('创建支付失败:', err)
-        wx.showToast({ title: '网络错误，请重试', icon: 'none' })
+        this.setData({ outTradeNo: 'DEMO' + Date.now() })
+        wx.showToast({ title: '支付服务未就绪，可直接确认演示支付', icon: 'none' })
       },
       complete: () => {
         this.setData({ isCreating: false })

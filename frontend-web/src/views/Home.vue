@@ -4,7 +4,7 @@
       <el-carousel :interval="5000" height="420px" class="home-carousel">
         <el-carousel-item v-for="item in carouselItems" :key="item.id">
           <div class="relative h-full">
-            <img :src="item.image" :alt="item.title" class="h-full w-full object-cover object-center" />
+            <img :src="item.image" :alt="item.title" class="h-full w-full object-cover object-center" @error="applyImageFallback" />
             <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"></div>
             <div class="absolute inset-y-0 left-0 flex w-full max-w-xl flex-col justify-center px-6 text-white sm:px-12">
               <p class="text-sm font-medium tracking-wide text-orange-200">{{ item.eyebrow }}</p>

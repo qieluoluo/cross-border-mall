@@ -1,4 +1,5 @@
-// pages/cart/cart.js
+const { resolveImage, DEFAULT_IMAGE } = require('../../utils/config')
+
 Page({
   data: {
     cartList: [],
@@ -67,7 +68,7 @@ Page({
     wx.showLoading({ title: '加载中...' })
     
     wx.request({
-      url: `http://localhost:8888/api/cart/list?username=${this.data.username}`,
+      url: `http://localhost:8888/api/cart/list?userId=${this.data.userId}&pageNum=1&pageSize=100`,
       method: 'GET',
       success: (res) => {
         console.log('购物车响应:', res.data)
@@ -76,17 +77,12 @@ Page({
           let cartList = res.data.data.records || []
           
           // 处理图片URL
-          cartList = cartList.map(item => {
-            const imagePath = item.productImage
-            const imageUrl = imagePath ? 'http://localhost:8888' + imagePath : 'http://localhost:8888/images/iphone.png'
-            return {
-              ...item,
-              productImage: imageUrl
-            }
-          })
+          cartList = cartList.map(item => ({
+            ...item,
+            productImage: resolveImage(item.productImage || item.mainImage)
+          }))
           
-          // 计算总价
-          const totalPrice = cartList.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+          const totalPrice = Number(cartList.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0).toFixed(2))
           
           this.setData({ 
             cartList: cartList, 
@@ -342,6 +338,7 @@ Page({
         id: item.id,
         productId: item.productId,
         productName: item.productName,
+        productImage: item.productImage,
         price: item.price,
         quantity: item.quantity,
         skuId: item.skuId
@@ -371,11 +368,12 @@ Page({
             duration: 1500
           })
           
+          this.clearCartAfterOrder()
           setTimeout(() => {
             wx.navigateTo({
               url: `/pages/pay/pay?orderId=${res.data.data}&amount=${totalPrice}`
             })
-          }, 1500)
+          }, 800)
         } else {
           wx.showToast({ 
             title: res.data.message || '下单失败', 
@@ -391,8 +389,28 @@ Page({
     })
   },
 
-  // 阻止弹窗内容点击冒泡
-  stopPropagation() {
-    // 空方法，用于阻止冒泡
-  }
+  onImageError(e) {
+    const index = e.currentTarget.dataset.index
+    if (index === undefined || index === null) return
+    this.setData({
+      [`cartList[${index}].productImage`]: DEFAULT_IMAGE
+    })
+  },
+
+  goToHome() {
+    wx.switchTab({ url: '/pages/index/index' })
+  },
+
+  clearCartAfterOrder() {
+    const cartList = this.data.cartList || []
+    cartList.forEach((item) => {
+      wx.request({
+        url: `http://localhost:8888/api/cart/delete/${item.id}`,
+        method: 'DELETE'
+      })
+    })
+    this.setData({ cartList: [], totalPrice: 0 })
+  },
+
+  stopPropagation() {}
 })

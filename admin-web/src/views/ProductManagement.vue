@@ -51,7 +51,7 @@
         <el-table-column prop="subTitle" label="副标题" width="150" show-overflow-tooltip />
         <el-table-column prop="mainImage" label="主图" width="150">
           <template #default="{ row }">
-            <img v-if="row.mainImage" :src="row.mainImage" class="main-image" />
+            <img v-if="row.mainImage" :src="row.mainImage" class="main-image" @error="applyImageFallback" />
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -100,7 +100,7 @@
         </el-descriptions-item>
         <el-descriptions-item label="副标题" :span="2">{{ currentProduct.subTitle }}</el-descriptions-item>
         <el-descriptions-item label="主图" :span="2">
-          <img v-if="currentProduct.mainImage" :src="currentProduct.mainImage" class="detail-image" />
+          <img v-if="currentProduct.mainImage" :src="currentProduct.mainImage" class="detail-image" @error="applyImageFallback" />
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ currentProduct.createTime }}</el-descriptions-item>
@@ -232,6 +232,13 @@ const resolveImageUrl = (path) => {
   if (!path) return ''
   if (path.startsWith('http://') || path.startsWith('https://')) return path
   return path.startsWith('/') ? path : `/${path}`
+}
+
+const applyImageFallback = (event) => {
+  const target = event?.target
+  if (!target) return
+  target.onerror = null
+  target.src = '/images/placeholder.png'
 }
 
 const normalizeProduct = (item) => {

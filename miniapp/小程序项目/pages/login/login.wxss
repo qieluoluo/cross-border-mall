@@ -1,36 +1,72 @@
-/* pages/login/login.wxss */
-page {
-  background: #fff;
+.page {
+  min-height: 100vh;
+  padding: 80rpx 48rpx 40rpx;
+  background: linear-gradient(180deg, #fff7ed 0%, #f6f7f9 42%);
+  box-sizing: border-box;
 }
-.container {
-  padding: 100rpx 50rpx;
-  text-align: center;
+
+.hero {
+  margin-bottom: 64rpx;
 }
-.logo {
-  font-size: 120rpx;
+
+.brand {
+  display: block;
+  color: #ea580c;
+  font-size: 28rpx;
+  font-weight: 700;
 }
+
 .title {
-  font-size: 48rpx;
-  font-weight: bold;
-  margin: 30rpx 0 80rpx;
+  display: block;
+  margin-top: 16rpx;
+  font-size: 52rpx;
+  font-weight: 700;
 }
+
+.desc {
+  display: block;
+  margin-top: 16rpx;
+  color: #6b7280;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
 .input {
-  border: 1px solid #eee;
-  border-radius: 60rpx;
-  padding: 25rpx 40rpx;
-  margin-bottom: 30rpx;
+  height: 96rpx;
+  margin-bottom: 24rpx;
+  padding: 0 32rpx;
+  background: #fff;
+  border-radius: 20rpx;
   font-size: 30rpx;
 }
-.login-btn {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-  color: #fff;
-  border-radius: 60rpx;
-  margin-top: 40rpx;
+
+.primary,
+.ghost {
+  margin-top: 12rpx;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
 }
-.register-btn {
+
+.primary {
+  background: #f97316;
+  color: #fff;
+}
+
+.ghost {
   background: #fff;
-  color: #ff6b6b;
-  border: 1px solid #ff6b6b;
-  border-radius: 60rpx;
-  margin-top: 20rpx;
+  color: #ea580c;
+}
+
+.primary::after,
+.ghost::after {
+  border: none;
+}
+
+.hint {
+  display: block;
+  margin-top: 36rpx;
+  color: #9ca3af;
+  font-size: 24rpx;
+  text-align: center;
 }

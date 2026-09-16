@@ -16,7 +16,9 @@
     "showES6CompileOption": false,
     "bigPackageSizeSupport": false,
     "checkInvalidKey": true,
-    "ignoreDevUnusedFiles": true
+    "ignoreDevUnusedFiles": false,
+    "useApiHostProcess": true
   },
-  "libVersion": "3.15.2"
+  "libVersion": "3.15.2",
+  "condition": {}
 }

@@ -43,7 +43,7 @@
 .item-price {
   font-size: 36rpx;
   font-weight: bold;
-  color: #ff4d4f;
+  color: #ea580c;
 }
 
 .item-quantity {
@@ -100,11 +100,11 @@
 .total-price {
   font-size: 44rpx;
   font-weight: bold;
-  color: #ff4d4f;
+  color: #ea580c;
 }
 
 .checkout-btn {
-  background: #ff4d4f;
+  background: #f97316;
   color: white;
   font-size: 32rpx;
   padding: 16rpx 48rpx;
@@ -125,10 +125,9 @@
   padding-top: 300rpx;
 }
 
-.empty-icon {
-  width: 300rpx;
-  height: 300rpx;
-  margin-bottom: 40rpx;
+.empty-emoji {
+  margin-bottom: 24rpx;
+  font-size: 80rpx;
 }
 
 .empty-text {
@@ -138,7 +137,7 @@
 }
 
 .go-shopping-btn {
-  background: #ff4d4f;
+  background: #f97316;
   color: white;
   font-size: 32rpx;
   padding: 20rpx 60rpx;
@@ -245,7 +244,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ff4d4f;
+  background: #f97316;
   color: white;
   border-radius: 50%;
   font-size: 32rpx;
@@ -305,7 +304,7 @@
 
 .order-item-price {
   font-size: 32rpx;
-  color: #ff4d4f;
+  color: #ea580c;
 }
 
 .order-item-quantity {
@@ -343,7 +342,7 @@
 }
 
 .confirm-btn {
-  background: #ff4d4f;
+  background: #f97316;
   color: white;
 }
 
@@ -353,7 +352,7 @@
 }
 
 .add-address-btn {
-  background: #ff4d4f;
+  background: #f97316;
   color: white;
   font-size: 32rpx;
   border-radius: 48rpx;

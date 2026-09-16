@@ -1,18 +1,22 @@
-<!-- pages/detail/detail.wxml -->
-<view class="container">
-  <view class="image-wrapper">
-    <image class="product-image" src="{{product.mainImage || 'http://localhost:8888/images/iphone.png'}}" mode="aspectFill"></image>
+<view class="page">
+  <image class="cover" src="{{product.mainImage}}" mode="aspectFill" binderror="onImageError"></image>
+
+  <view class="card">
+    <text class="price">¥{{product.price}}</text>
+    <text class="name">{{product.name}}</text>
+    <text class="sub">{{product.subTitle || '优选品质，方便日常选购'}}</text>
+    <view class="meta">
+      <text>销量 {{product.sales || 0}}</text>
+      <text>库存 {{product.stock || 0}}</text>
+    </view>
   </view>
 
-  <view class="product-info">
-    <text class="product-name">{{product.name}}</text>
-    <text class="product-subtitle" wx:if="{{product.subTitle}}">{{product.subTitle}}</text>
-    <text class="product-price">¥{{product.price}}</text>
-    <text class="product-stock">库存：{{product.stock}}件</text>
-    <text class="product-desc">描述：{{product.detailHtml || '暂无描述'}}</text>
+  <view class="card desc-card">
+    <text class="desc-title">商品详情</text>
+    <text class="desc">{{product.detailHtml || '暂无详细描述'}}</text>
   </view>
 
-  <view class="bottom-bar">
-    <button class="add-cart-btn" type="primary" bindtap="addToCart">加入购物车</button>
+  <view class="bottom">
+    <button class="cart-btn" bindtap="addToCart">加入购物车</button>
   </view>
 </view>

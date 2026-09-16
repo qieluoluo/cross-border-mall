@@ -20,7 +20,24 @@ public class ProductImageController {
 
     private static final Logger log = LoggerFactory.getLogger(ProductImageController.class);
     
-    private static final String IMAGE_DIR = "F:/study_project/springcloud/Bundaberg/projects/bundbaberg/bundaberg/static/images/";
+    private static String resolveImageDir() {
+        String userDir = System.getProperty("user.dir");
+        String[] candidates = {
+                "F:/大三课内/小学期/github/frontend-web/public/images/",
+                userDir + "/frontend-web/public/images/",
+                userDir + "/src/main/resources/static/images/",
+                userDir + "/frontend/shop-product/src/main/resources/static/images/",
+                "F:/study_project/springcloud/Bundaberg/projects/bundbaberg/bundaberg/static/images/"
+        };
+        for (String candidate : candidates) {
+            File dir = new File(candidate);
+            if (dir.exists() || dir.mkdirs()) {
+                String absolute = dir.getAbsolutePath().replace("\\", "/");
+                return absolute.endsWith("/") ? absolute : absolute + "/";
+            }
+        }
+        return candidates[0];
+    }
 
     @PostMapping("/image/upload")
     public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) {
@@ -36,9 +53,10 @@ public class ProductImageController {
         }
 
         try {
-            Path imagePath = Paths.get(IMAGE_DIR);
+            String imageDir = resolveImageDir();
+            Path imagePath = Paths.get(imageDir);
             if (!Files.exists(imagePath)) {
-                log.info("创建图片存储目录: {}", IMAGE_DIR);
+                log.info("创建图片存储目录: {}", imageDir);
                 Files.createDirectories(imagePath);
             }
 
@@ -49,7 +67,7 @@ public class ProductImageController {
             }
             
             String newFilename = UUID.randomUUID().toString() + extension;
-            File targetFile = new File(IMAGE_DIR + newFilename);
+            File targetFile = new File(imageDir + newFilename);
             
             log.info("保存图片到: {}", targetFile.getAbsolutePath());
             file.transferTo(targetFile);

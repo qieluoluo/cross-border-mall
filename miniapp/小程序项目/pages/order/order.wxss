@@ -1,98 +1,91 @@
-/* pages/order/order.wxss */
-page {
-  background: #f5f5f5;
+.page {
+  padding: 20rpx 24rpx 40rpx;
 }
 
-.container {
-  padding: 20rpx;
-  background: #f5f5f5;
-}
-
-.order-item {
-  background: #fff;
+.order-card {
   margin-bottom: 20rpx;
-  border-radius: 16rpx;
   overflow: hidden;
-  border: 1px solid #ddd;
-  width: 100%;
-  box-sizing: border-box;
+  background: #fff;
+  border-radius: 20rpx;
+}
+
+.order-header,
+.order-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 24rpx;
 }
 
 .order-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 24rpx 20rpx;
-  font-size: 28rpx;
-  color: #333;
   background: #fafafa;
-  border-bottom: 1px solid #eee;
+}
+
+.order-no {
+  color: #6b7280;
+  font-size: 24rpx;
 }
 
 .status {
-  color: #ff4444;
+  color: #ea580c;
+  font-size: 24rpx;
+  font-weight: 600;
 }
 
-.order-goods {
-  padding: 24rpx 20rpx;
-  min-height: 80rpx;
-}
-
-.goods-info {
+.goods {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  padding: 20rpx 24rpx;
 }
 
-.goods-name {
-  font-size: 28rpx;
-  color: #333;
+.goods-img {
+  width: 112rpx;
+  height: 112rpx;
+  margin-right: 16rpx;
+  background: #f3f4f6;
+  border-radius: 12rpx;
+}
+
+.goods-main {
   flex: 1;
 }
 
-.goods-price {
+.goods-name {
+  display: block;
   font-size: 28rpx;
-  color: #ff4444;
-  text-align: right;
 }
 
-.order-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx;
-  border-top: 1px solid #eee;
-  background: #fff;
-  min-height: 100rpx;
+.goods-qty {
+  color: #9ca3af;
+  font-size: 22rpx;
 }
 
-.btn-group {
-  display: flex;
-  gap: 20rpx;
-}
-
-.logistics-btn {
-  background: #f5f5f5;
-  color: #666;
-  font-size: 26rpx;
-  padding: 0 24rpx;
-  height: 60rpx;
-  line-height: 60rpx;
-  border-radius: 30rpx;
+.goods-price,
+.pay-text {
+  color: #ea580c;
+  font-weight: 700;
 }
 
 .pay-btn {
-  background: #ff4444;
+  background: #f97316;
   color: #fff;
-  font-size: 26rpx;
-  padding: 0 24rpx;
-  height: 60rpx;
-  line-height: 60rpx;
-  border-radius: 30rpx;
+  border-radius: 28rpx;
 }
 
-.empty-order {
+.pay-btn::after {
+  border: none;
+}
+
+.empty {
+  padding: 160rpx 0;
+  color: #9ca3af;
   text-align: center;
-  padding: 100rpx 0;
-  color: #999;
+}
+
+.ghost {
+  width: 280rpx;
+  margin-top: 24rpx;
+  background: #fff;
+  color: #ea580c;
+  border-radius: 40rpx;
 }
