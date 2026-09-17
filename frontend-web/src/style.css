@@ -8,7 +8,10 @@
   box-sizing: border-box;
 }
 
-html, body {
+html, body, #app {
+  height: 100%;
+  overflow: hidden;
+  overflow-anchor: none;
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
   background-color: #f5f5f5;
 }

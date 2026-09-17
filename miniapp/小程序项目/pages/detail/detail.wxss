@@ -1,5 +1,5 @@
 .page {
-  padding-bottom: 160rpx;
+  padding-bottom: 180rpx;
 }
 
 .cover {
@@ -44,6 +44,51 @@
   font-size: 24rpx;
 }
 
+.qty-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qty-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #111827;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 12rpx;
+}
+
+.stepper-btn {
+  width: 64rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  color: #374151;
+  font-size: 36rpx;
+  text-align: center;
+  background: #f9fafb;
+}
+
+.stepper-btn.disabled {
+  color: #d1d5db;
+}
+
+.stepper-num {
+  min-width: 72rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-align: center;
+  border-left: 1rpx solid #e5e7eb;
+  border-right: 1rpx solid #e5e7eb;
+}
+
 .desc-title {
   display: block;
   margin-bottom: 12rpx;
@@ -62,18 +107,39 @@
   right: 0;
   bottom: 0;
   left: 0;
+  display: flex;
+  gap: 16rpx;
   padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom));
   background: #fff;
   box-shadow: 0 -6rpx 20rpx rgba(15, 23, 42, 0.06);
 }
 
-.cart-btn {
-  background: #f97316;
-  color: #fff;
-  border-radius: 48rpx;
+.cart-btn,
+.buy-btn {
+  flex: 1;
+  margin: 0;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
   font-weight: 600;
+  border-radius: 48rpx;
 }
 
-.cart-btn::after {
+.cart-btn {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.buy-btn {
+  background: #f97316;
+  color: #fff;
+}
+
+.btn-hover {
+  opacity: 0.88;
+}
+
+.cart-btn::after,
+.buy-btn::after {
   border: none;
 }

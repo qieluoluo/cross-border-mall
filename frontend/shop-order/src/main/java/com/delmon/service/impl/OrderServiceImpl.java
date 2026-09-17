@@ -14,14 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,74 +39,168 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Result<Long> create(Map<String, Object> params) {
-        // 简化版：直接创建订单
-        Long userId = Long.valueOf(params.get("userId").toString());
-        List<Map<String, Object>> items = (List<Map<String, Object>>) params.get("items");
+        if (params == null || params.get("userId") == null) {
+            return Result.validationError("用户ID不能为空");
+        }
 
-        // 计算总金额
+        Long userId = toLong(params.get("userId"), null);
+        if (userId == null) {
+            return Result.validationError("用户ID不能为空");
+        }
+
+        List<Map<String, Object>> items = extractItems(params.get("items"));
+        if (items.isEmpty()) {
+            return Result.validationError("订单商品不能为空");
+        }
+
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (Map<String, Object> item : items) {
-            BigDecimal price = new BigDecimal(item.get("price").toString());
-            Integer quantity = Integer.valueOf(item.get("quantity").toString());
-            totalAmount = totalAmount.add(price.multiply(new BigDecimal(quantity)));
+            BigDecimal price = toDecimal(item.get("price"), BigDecimal.ZERO);
+            Integer quantity = toInt(item.get("quantity"), 1);
+            totalAmount = totalAmount.add(price.multiply(BigDecimal.valueOf(quantity)));
+        }
+        if (totalAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            BigDecimal payloadTotal = toDecimal(params.get("totalAmount"), BigDecimal.ZERO);
+            if (payloadTotal.compareTo(BigDecimal.ZERO) > 0) {
+                totalAmount = payloadTotal;
+            }
         }
 
-        // 创建订单
         Order order = new Order();
-        order.setOrderNo("ORD" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + System.currentTimeMillis() % 10000);
+        order.setOrderNo("ORD" + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 4).toUpperCase());
         order.setUserId(userId);
         order.setTotalAmount(totalAmount);
-        order.setPayAmount(totalAmount);
-        order.setFreightAmount(BigDecimal.ZERO);
-        order.setDiscountAmount(BigDecimal.ZERO);
-        order.setStatus(0); // 待付款
-        order.setPayType(2); // 默认支付方式：支付宝
+        order.setPayAmount(toDecimal(params.get("payAmount"), totalAmount));
+        order.setFreightAmount(toDecimal(params.get("freightAmount"), BigDecimal.ZERO));
+        order.setDiscountAmount(toDecimal(params.get("discountAmount"), BigDecimal.ZERO));
+        order.setStatus(0);
+        order.setPayType(2);
+        order.setAddressId(toLong(params.get("addressId"), 0L));
+        order.setReceiverName(clip(params.get("receiverName"), 50, null));
+        order.setReceiverPhone(clipPhone(params.get("receiverPhone")));
+        order.setReceiverAddress(clip(params.get("receiverAddress"), 500, null));
+        order.setRemark(clip(params.get("remark"), 500, null));
+        order.setCreateTime(LocalDateTime.now());
+        order.setUpdateTime(LocalDateTime.now());
 
-        if (params.containsKey("addressId") && params.get("addressId") != null) {
-            order.setAddressId(Long.valueOf(params.get("addressId").toString()));
-        } else {
-            order.setAddressId(0L);
+        try {
+            orderMapper.insert(order);
+            saveOrderItems(order, items);
+            return Result.success(order.getId());
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            log.error("创建订单失败: {}", e.getMessage(), e);
+            return Result.error(ResultCode.SYSTEM_ERROR, "创建订单失败，请稍后重试");
         }
-        if (params.containsKey("receiverName") && params.get("receiverName") != null) {
-            order.setReceiverName(params.get("receiverName").toString());
-        }
-        if (params.containsKey("receiverPhone") && params.get("receiverPhone") != null) {
-            order.setReceiverPhone(params.get("receiverPhone").toString());
-        }
-        if (params.containsKey("receiverAddress") && params.get("receiverAddress") != null) {
-            order.setReceiverAddress(params.get("receiverAddress").toString());
-        }
-        if (params.containsKey("remark") && params.get("remark") != null) {
-            order.setRemark(params.get("remark").toString());
-        }
+    }
 
-        orderMapper.insert(order);
-        saveOrderItems(order, items);
-        return Result.success(order.getId());
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> extractItems(Object raw) {
+        if (raw instanceof List<?> list) {
+            return list.stream()
+                    .filter(Map.class::isInstance)
+                    .map(item -> (Map<String, Object>) item)
+                    .toList();
+        }
+        return List.of();
     }
 
     private void saveOrderItems(Order order, List<Map<String, Object>> items) {
-        if (items == null || items.isEmpty()) {
-            return;
-        }
         for (Map<String, Object> item : items) {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrderId(order.getId());
             orderItem.setOrderNo(order.getOrderNo());
-            orderItem.setProductId(item.get("productId") == null ? 0L : Long.valueOf(item.get("productId").toString()));
-            orderItem.setSkuId(item.get("skuId") == null ? 1L : Long.valueOf(item.get("skuId").toString()));
-            orderItem.setProductName(item.get("productName") == null ? "商品" : item.get("productName").toString());
-            Object image = item.get("productImage") != null ? item.get("productImage") : item.get("image");
-            orderItem.setProductImage(image == null ? "" : image.toString());
-            orderItem.setSpecs(item.get("specs") == null ? "默认规格" : item.get("specs").toString());
-            BigDecimal price = new BigDecimal(item.get("price").toString());
-            Integer quantity = Integer.valueOf(item.get("quantity").toString());
+            Long productId = toLong(firstNonNull(item.get("productId"), item.get("id")), 0L);
+            Long skuId = toLong(item.get("skuId"), productId);
+            if (skuId == null || skuId <= 0) {
+                skuId = productId == null || productId <= 0 ? 1L : productId;
+            }
+            orderItem.setProductId(productId == null ? 0L : productId);
+            orderItem.setSkuId(skuId);
+            orderItem.setProductName(clip(firstNonNull(item.get("productName"), item.get("name")), 200, "商品"));
+            Object image = firstNonNull(item.get("productImage"), item.get("mainImage"), item.get("image"));
+            orderItem.setProductImage(clip(image, 500, ""));
+            orderItem.setSpecs(clip(item.get("specs"), 255, "默认规格"));
+            BigDecimal price = toDecimal(item.get("price"), BigDecimal.ZERO);
+            Integer quantity = toInt(item.get("quantity"), 1);
             orderItem.setPrice(price);
             orderItem.setQuantity(quantity);
-            orderItem.setTotalAmount(price.multiply(new BigDecimal(quantity)));
+            orderItem.setTotalAmount(price.multiply(BigDecimal.valueOf(quantity)));
             orderItem.setCreateTime(LocalDateTime.now());
             orderItemMapper.insert(orderItem);
         }
+    }
+
+    private Object firstNonNull(Object... values) {
+        if (values == null) {
+            return null;
+        }
+        for (Object value : values) {
+            if (value != null && !value.toString().isBlank()) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private Long toLong(Object value, Long fallback) {
+        if (value == null || value.toString().isBlank()) {
+            return fallback;
+        }
+        try {
+            return new BigDecimal(value.toString().trim()).longValue();
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
+
+    private Integer toInt(Object value, Integer fallback) {
+        if (value == null || value.toString().isBlank()) {
+            return fallback;
+        }
+        try {
+            return new BigDecimal(value.toString().trim()).intValue();
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
+
+    private BigDecimal toDecimal(Object value, BigDecimal fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        String text = value.toString().trim().replace("¥", "").replace(",", "");
+        if (text.isEmpty()) {
+            return fallback;
+        }
+        try {
+            return new BigDecimal(text);
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
+
+    private String clip(Object value, int max, String fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        String text = value instanceof Map || value instanceof List ? String.valueOf(value) : value.toString().trim();
+        if (text.isEmpty()) {
+            return fallback;
+        }
+        return text.length() <= max ? text : text.substring(0, max);
+    }
+
+    private String clipPhone(Object value) {
+        String phone = clip(value, 32, null);
+        if (phone == null) {
+            return null;
+        }
+        String digits = phone.replaceAll("\\D", "");
+        if (digits.isEmpty()) {
+            return clip(phone, 11, null);
+        }
+        return digits.length() <= 11 ? digits : digits.substring(digits.length() - 11);
     }
 
     private List<OrderItem> listOrderItems(Long orderId) {

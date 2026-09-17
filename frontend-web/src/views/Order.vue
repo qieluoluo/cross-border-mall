@@ -19,7 +19,20 @@
     </div>
     </div>
 
-    <div v-if="orderList.length === 0" class="py-20 text-center">
+    <div v-if="loading" class="space-y-4 py-2">
+      <div v-for="n in 3" :key="n" class="border border-gray-200 p-4">
+        <div class="mb-4 h-4 w-48 bg-gray-100"></div>
+        <div class="flex items-center gap-4">
+          <div class="h-16 w-16 bg-gray-100"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-4 w-2/3 bg-gray-100"></div>
+            <div class="h-3 w-1/3 bg-gray-100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="orderList.length === 0" class="py-20 text-center">
       <p class="text-gray-500">暂无订单</p>
       <router-link to="/products" class="mt-5 inline-block text-sm font-medium text-orange-600 hover:text-orange-700">去选购商品</router-link>
     </div>
@@ -98,6 +111,7 @@ import { applyImageFallback, getProductImage } from '../utils/image'
 const router = useRouter()
 const orderList = ref([])
 const activeTab = ref('')
+const loading = ref(true)
 
 const tabs = [
   { label: '全部', value: '' },
@@ -138,11 +152,14 @@ const loadOrders = () => {
     router.push('/login')
     return
   }
+  loading.value = true
   orderAPI.getOrderList(activeTab.value).then(res => {
     orderList.value = res.data || []
   }).catch(err => {
     ElMessage.error(err.message || '订单加载失败')
     orderList.value = []
+  }).finally(() => {
+    loading.value = false
   })
 }
 

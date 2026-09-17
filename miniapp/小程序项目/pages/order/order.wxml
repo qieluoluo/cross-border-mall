@@ -12,7 +12,8 @@
             <image class="goods-img" src="{{goods.productImage}}" mode="aspectFill" binderror="onImageError" data-order-index="{{orderIndex}}" data-goods-index="{{goodsIndex}}"></image>
             <view class="goods-main">
               <text class="goods-name">{{goods.productName || '商品'}}</text>
-              <text class="goods-qty">x{{goods.quantity || 1}}</text>
+              <text class="goods-qty" wx:if="{{goods.specs}}">{{goods.specs}} · x{{goods.quantity || 1}}</text>
+              <text class="goods-qty" wx:else>x{{goods.quantity || 1}}</text>
             </view>
             <text class="goods-price">¥{{goods.price}}</text>
           </view>
@@ -24,8 +25,18 @@
       </view>
 
       <view class="order-footer">
-        <text class="pay-text">实付 ¥{{item.payAmount || item.totalAmount}}</text>
-        <button class="pay-btn" size="mini" wx:if="{{item.status === 0}}" bindtap="goPay" data-order-id="{{item.id}}" data-total-price="{{item.payAmount || item.totalAmount}}">去支付</button>
+        <view class="pay-info">
+          <text class="pay-label">实付</text>
+          <text class="pay-text">¥{{item.payAmount || item.totalAmount}}</text>
+        </view>
+        <button
+          class="pay-btn"
+          wx:if="{{item.status === 0}}"
+          hover-class="pay-btn-hover"
+          bindtap="goPay"
+          data-order-id="{{item.id}}"
+          data-total-price="{{item.payAmount || item.totalAmount}}"
+        >去支付</button>
       </view>
     </view>
   </block>

@@ -43,6 +43,17 @@
         <button @click="goToProducts(0)" class="text-sm font-medium text-gray-600 transition hover:text-orange-600">查看全部</button>
       </div>
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <template v-if="loading">
+          <div v-for="n in 8" :key="'sk-' + n" class="overflow-hidden border border-gray-200 bg-white">
+            <div class="h-52 bg-gray-100"></div>
+            <div class="space-y-3 p-4">
+              <div class="h-4 w-3/4 bg-gray-100"></div>
+              <div class="h-3 w-1/2 bg-gray-100"></div>
+              <div class="h-6 w-24 bg-gray-100"></div>
+            </div>
+          </div>
+        </template>
+        <template v-else>
         <div
             v-for="product in products"
             :key="product.id"
@@ -71,6 +82,7 @@
             </div>
           </div>
         </div>
+        </template>
       </div>
     </section>
 
@@ -105,6 +117,7 @@ import { applyImageFallback, getProductImage } from '../utils/image'
 
 const router = useRouter()
 const products = ref([])
+const loading = ref(true)
 
 const carouselItems = [
   {
@@ -145,12 +158,15 @@ const categories = [
 ]
 
 const loadProducts = () => {
+  loading.value = true
   productAPI.getProductList(1, 8).then(res => {
     if (res.code === 200) {
       products.value = res.data.records || []
     }
   }).catch((err) => {
     ElMessage.error(err.message || '商品加载失败，请确认商品服务已启动')
+  }).finally(() => {
+    loading.value = false
   })
 }
 

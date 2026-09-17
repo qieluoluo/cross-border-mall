@@ -1,5 +1,5 @@
 const { request } = require('../../utils/request')
-const { resolveImage, DEFAULT_IMAGE } = require('../../utils/config')
+const { resolveImage, DEFAULT_IMAGE, formatSpecs } = require('../../utils/config')
 
 const STATUS_MAP = {
   0: '待付款',
@@ -41,7 +41,9 @@ Page({
           statusText: STATUS_MAP[item.status] || '处理中',
           items: (item.items || []).map((goods) => ({
             ...goods,
-            productImage: resolveImage(goods.productImage || goods.product_image || goods.image)
+            productImage: resolveImage(goods.productImage || goods.product_image || goods.image),
+            specs: formatSpecs(goods.specs),
+            productName: goods.productName || goods.name || '商品'
           }))
         }))
       this.setData({ orderList })

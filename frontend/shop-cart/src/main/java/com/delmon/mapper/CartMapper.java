@@ -21,8 +21,8 @@ public interface CartMapper extends BaseMapper<Cart> {
                 c.quantity,
                 COALESCE(NULLIF(u.nickname, ''), u.username, CONCAT('用户', c.user_id)) AS userName,
                 COALESCE(p.name, CONCAT('商品', c.product_id)) AS productName,
-                COALESCE(ps.price, p.price, 0) AS price,
-                c.quantity * COALESCE(ps.price, p.price, 0) AS totalPrice,
+                COALESCE(CASE WHEN ps.product_id = c.product_id THEN ps.price END, p.price, 0) AS price,
+                c.quantity * COALESCE(CASE WHEN ps.product_id = c.product_id THEN ps.price END, p.price, 0) AS totalPrice,
                 p.main_image AS productImage,
                 c.create_time AS createTime
             FROM cart c

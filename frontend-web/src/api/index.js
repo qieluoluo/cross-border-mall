@@ -45,7 +45,7 @@ export const getCurrentUserId = () => {
   return Number.isNaN(uid) ? null : uid
 }
 
-const ORDER_ITEMS_KEY = 'order_items_cache'
+const ORDER_ITEMS_KEY = 'order_items_cache_v2'
 
 const readOrderItemCache = () => {
   try {
@@ -215,7 +215,7 @@ export const cartAPI = {
     return instance.post('/cart/add', {
       userId: uid,
       productId,
-      skuId: 1,
+      skuId: productId,
       quantity
     })
   },
@@ -242,7 +242,16 @@ export const orderAPI = {
       return Promise.reject(new Error('请先登录'))
     }
 
-    const items = (order.items || []).map((item) => normalizeProductFields({ ...item }))
+    const items = (order.items || []).map((item) => {
+      const mapped = normalizeProductFields({ ...item })
+      return {
+        ...mapped,
+        productId: mapped.productId || mapped.id,
+        skuId: mapped.skuId || mapped.productId || mapped.id,
+        price: Number(mapped.price || 0),
+        quantity: Number(mapped.quantity || 1)
+      }
+    })
     const payload = {
       ...order,
       userId: uid,

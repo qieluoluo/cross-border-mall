@@ -71,6 +71,26 @@ export const applyImageFallback = (event) => {
   target.src = DEFAULT_IMAGE
 }
 
+export const formatSpecs = (specs) => {
+  if (specs == null || specs === '') return '默认规格'
+  if (typeof specs === 'object' && !Array.isArray(specs)) {
+    const parts = Object.entries(specs)
+      .filter(([, value]) => value != null && String(value).trim() !== '')
+      .map(([key, value]) => `${key} ${value}`)
+    return parts.length ? parts.join(' / ') : '默认规格'
+  }
+  const text = String(specs).trim()
+  if (!text) return '默认规格'
+  if (text.startsWith('{') && text.endsWith('}')) {
+    try {
+      return formatSpecs(JSON.parse(text))
+    } catch {
+      return text
+    }
+  }
+  return text
+}
+
 export const normalizeProductFields = (product) => {
   if (!product) return product
 
@@ -81,12 +101,22 @@ export const normalizeProductFields = (product) => {
   if (product.product_image && !product.productImage) product.productImage = product.product_image
   if (product.create_time && !product.createTime) product.createTime = product.create_time
   if (product.update_time && !product.updateTime) product.updateTime = product.update_time
+  if (product.specs) product.specs = formatSpecs(product.specs)
 
   const imagePath = resolveProductImagePath(product)
   if (imagePath) {
-    product.image = imagePath
-    if (!product.mainImage) product.mainImage = imagePath
-    if (!product.productImage) product.productImage = imagePath
+    const mappedPath = imagePath
+      .replace(/iphone15pro\.jpg$/i, 'iphone15pro.png')
+      .replace(/xiaomi14u\.jpg$/i, 'xiaomi14u.png')
+      .replace(/huawei60pro\.jpg$/i, 'huawei60pro.png')
+      .replace(/geli_kfr35\.jpg$/i, 'geli_kfr35.png')
+      .replace(/haier_bcd500\.jpg$/i, 'haier_bcd500.png')
+      .replace(/uniqlo_dress\.jpg$/i, 'uniqlo_dress.png')
+      .replace(/nike_men\.jpg$/i, 'nike.png')
+      .replace(/thinkpad_x1\.jpg$/i, 'lianxiang.png')
+    product.image = mappedPath
+    if (!product.mainImage) product.mainImage = mappedPath
+    if (!product.productImage) product.productImage = mappedPath
   }
 
   return product

@@ -48,7 +48,18 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div v-if="loading" class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <div v-for="n in 6" :key="n" class="overflow-hidden border border-gray-200 bg-white">
+            <div class="h-52 bg-gray-100"></div>
+            <div class="space-y-3 p-4">
+              <div class="h-4 w-3/4 bg-gray-100"></div>
+              <div class="h-3 w-1/2 bg-gray-100"></div>
+              <div class="h-6 w-24 bg-gray-100"></div>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           <div
               v-for="product in products"
               :key="product.id"
@@ -108,6 +119,7 @@ const pageSize = ref(9)
 const selectedCategory = ref(0)
 const currentSort = ref('default')
 const searchKeyword = ref('')
+const loading = ref(true)
 
 const categoryList = ref([
   { id: 0, name: '全部商品' }
@@ -148,6 +160,7 @@ const loadCategories = async () => {
 }
 
 const loadProducts = () => {
+  loading.value = true
   const request = searchKeyword.value
     ? productAPI.searchProducts(searchKeyword.value, pageNum.value, pageSize.value)
     : productAPI.getProductList(pageNum.value, pageSize.value, selectedCategory.value, currentSort.value)
@@ -159,6 +172,8 @@ const loadProducts = () => {
     ElMessage.error(err.message || '商品加载失败')
     products.value = []
     total.value = 0
+  }).finally(() => {
+    loading.value = false
   })
 }
 

@@ -329,19 +329,27 @@ Page({
     const { selectedAddress, cartList, totalPrice, userId } = this.data
     
     console.log('确认下单:', { selectedAddress, cartList, totalPrice, userId })
+
+    if (!selectedAddress) {
+      wx.showToast({ title: '请先选择收货地址', icon: 'none' })
+      return
+    }
+    if (!cartList || cartList.length === 0) {
+      wx.showToast({ title: '购物车是空的', icon: 'none' })
+      return
+    }
     
     wx.showLoading({ title: '提交中...' })
 
     const orderData = {
       userId: userId,
       items: cartList.map(item => ({
-        id: item.id,
         productId: item.productId,
         productName: item.productName,
         productImage: item.productImage,
-        price: item.price,
-        quantity: item.quantity,
-        skuId: item.skuId
+        price: Number(item.price || 0),
+        quantity: Number(item.quantity || 1),
+        skuId: item.skuId || item.productId
       })),
       totalAmount: totalPrice,
       addressId: selectedAddress.id,

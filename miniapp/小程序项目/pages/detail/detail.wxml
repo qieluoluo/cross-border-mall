@@ -11,12 +11,22 @@
     </view>
   </view>
 
+  <view class="card qty-card">
+    <text class="qty-label">购买数量</text>
+    <view class="stepper">
+      <view class="stepper-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decQuantity">-</view>
+      <text class="stepper-num">{{quantity}}</text>
+      <view class="stepper-btn {{quantity >= maxQuantity ? 'disabled' : ''}}" bindtap="incQuantity">+</view>
+    </view>
+  </view>
+
   <view class="card desc-card">
     <text class="desc-title">商品详情</text>
     <text class="desc">{{product.detailHtml || '暂无详细描述'}}</text>
   </view>
 
   <view class="bottom">
-    <button class="cart-btn" bindtap="addToCart">加入购物车</button>
+    <button class="cart-btn" hover-class="btn-hover" bindtap="addToCart">加入购物车</button>
+    <button class="buy-btn" hover-class="btn-hover" bindtap="buyNow">立即购买</button>
   </view>
 </view>

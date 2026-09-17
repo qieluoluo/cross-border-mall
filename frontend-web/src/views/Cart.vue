@@ -179,7 +179,7 @@ const checkout = async () => {
       productImage: item.productImage || item.mainImage || item.image,
       price: item.price,
       quantity: item.quantity,
-      skuId: item.skuId || 1,
+      skuId: item.skuId || item.productId,
       specs: item.specs || '默认规格'
     }))
 
